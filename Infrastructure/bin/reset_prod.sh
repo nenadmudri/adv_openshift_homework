@@ -17,4 +17,11 @@ echo "Resetting Parks Production Environment in project ${GUID}-parks-prod to Gr
 # up the whole infrastructure to guarantee a Blue
 # rollout followed by a Green rollout.
 
-# To be Implemented by Student
+####    Reset the three microservices to the Green version to guarantee a Blue rollout upon the first pipeline run
+
+
+
+oc delete svc/b-mlbparks 
+oc expose dc/g-mlbparks --port=8080 -l type="parksmap-backend" 
+oc delete svc/b-mlbparks
+oc expose dc/g-mlbparks --port=8080 -l type="parksmap-backend-standby" 
