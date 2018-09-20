@@ -205,9 +205,8 @@ l -XGET http://localhost:8080/ws/data/load/']}}}}}"
 #oc rollout latest dc/b-mlbparks -n 0254-parks-prod
 
 oc set deployment-hook dc/g-nationalparks --post     -- curl -s http://nationalparks:8080/ws/data/load/
-
-oc rollout latest dc/g-nationalparks -n 0254-parks-prod
+oc rollout latest dc/g-nationalparks -n $GUID-parks-prod
 
 oc set deployment-hook dc/g-mlbparks --post     -- curl -s http://mlbparks:8080/ws/data/load/
-oc rollout latest dc/g-mlbparks -n 0254-parks-prod
+oc rollout latest dc/g-mlbparks -n $GUID-parks-prod
 

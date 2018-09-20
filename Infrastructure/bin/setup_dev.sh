@@ -11,6 +11,20 @@ echo "Setting up Parks Development Environment in project ${GUID}-parks-dev"
 
 # Code to set up the parks development project.
 
+
+
+# Compile all projects
+
+cd $HOME/advdev_homework_template/Nationalparks
+mvn -s ../nexus_settings.xml clean package -Dmaven.test.skip=true
+
+cd $HOME/advdev_homework_template/MLBParks
+mvn -s ../nexus_settings.xml clean package -Dmaven.test.skip=true
+
+cd $HOME/advdev_homework_template/ParksMap
+mvn -s ../nexus_settings.xml clean package spring-boot:repackage -DskipTests -Dcom.redhat.xpaas.repo.redhatga
+
+
 ######    Grant the correct permissions to the Jenkins service account
 
 #oc new-project $GUID-parks-dev --display-name "Shared Parks Dev"
@@ -136,8 +150,8 @@ oc patch dc/nationalparks --patch "spec: { strategy: {type: Rolling, rollingPara
     
 oc set deployment-hook dc/nationalparks --post     -- curl -s http://nationalparks:8080/ws/data/load/
 
-oc rollout latest dc/nationalparks -n 0254-parks-dev
+oc rollout latest dc/nationalparks -n $GUID-parks-dev
 
 oc set deployment-hook dc/mlbparks --post     -- curl -s http://mlbparks:8080/ws/data/load/
 
-oc rollout latest dc/mlbparks -n 0254-parks-dev
+oc rollout latest dc/mlbparks -n $GUID-parks-dev
