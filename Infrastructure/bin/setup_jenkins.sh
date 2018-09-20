@@ -63,6 +63,6 @@ sudo docker build . -t docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenki
 #sudo docker push docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appdev:v3.9
 
 #####     Create a build configuration to build the custom Maven slave pod to include Skopeo
-skopeo copy --dest-tls-verify=false --dest-creds=$(oc whoami):$(oc whoami -t) docker-daemon:docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appdev:v3.9 docker://docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appdev:v3.9
+sudo skopeo copy --dest-tls-verify=false --dest-creds=$(oc whoami):$(oc whoami -t) docker-daemon:docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appdev:v3.9 docker://docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appdev:v3.9
 
 
