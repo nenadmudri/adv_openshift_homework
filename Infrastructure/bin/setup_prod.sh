@@ -95,7 +95,7 @@ oc new-app $GUID-parks-prod/g-mlbparks:latest -e APPNAME="MLB Parks (Green)" --n
 
 oc start-build b-nationalparks --from-file=$HOME/advdev_homework_template/Nationalparks/target/nationalparks.jar --follow
 oc new-app $GUID-parks-prod/b-nationalparks:latest -e APPNAME="National Parks (Blue)" --name=b-nationalparks
-oc start-build nationalparks --from-file=$HOME/advdev_homework_template/Nationalparks/target/nationalparks.jar --follow
+oc start-build g-nationalparks --from-file=$HOME/advdev_homework_template/Nationalparks/target/nationalparks.jar --follow
 oc new-app $GUID-parks-prod/g-nationalparks:latest -e APPNAME="National Parks (Green)" --name=g-nationalparks
 
 
@@ -139,7 +139,7 @@ oc expose svc g-parksmap  -l type=parksmap-backend
 oc set probe dc/b-mlbparks --readiness     --initial-delay-seconds 30 --failure-threshold 3   --get-url=http://:8080/ws/healthz/
 oc set probe dc/b-mlbparks --liveness      --initial-delay-seconds 30 --failure-threshold 3     --get-url=http://:8080/ws/healthz/
 
-oc set probe dc/b-nationalarks --readiness     --initial-delay-seconds 30 --failure-threshold 3   --get-url=http://:8080/ws/healthz/
+oc set probe dc/b-nationalparks --readiness     --initial-delay-seconds 30 --failure-threshold 3   --get-url=http://:8080/ws/healthz/
 oc set probe dc/b-nationalparks --liveness      --initial-delay-seconds 30 --failure-threshold 3     --get-url=http://:8080/ws/healthz/
 
 
@@ -149,7 +149,7 @@ oc set probe dc/b-parksmap --liveness      --initial-delay-seconds 30 --failure-
 oc set probe dc/g-mlbparks --readiness     --initial-delay-seconds 30 --failure-threshold 3   --get-url=http://:8080/ws/healthz/
 oc set probe dc/g-mlbparks --liveness      --initial-delay-seconds 30 --failure-threshold 3     --get-url=http://:8080/ws/healthz/
 
-oc set probe dc/g-nationalarks --readiness     --initial-delay-seconds 30 --failure-threshold 3   --get-url=http://:8080/ws/healthz/
+oc set probe dc/g-nationalparks --readiness     --initial-delay-seconds 30 --failure-threshold 3   --get-url=http://:8080/ws/healthz/
 oc set probe dc/g-nationalparks --liveness      --initial-delay-seconds 30 --failure-threshold 3     --get-url=http://:8080/ws/healthz/
 
 
