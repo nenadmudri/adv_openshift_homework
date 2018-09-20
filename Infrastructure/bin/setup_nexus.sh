@@ -31,10 +31,12 @@ echo "Setting up Nexus in project $GUID-nexus"
 
 
 ######## Create a new Nexus instance from docker.io/sonatype/nexus3:latest
-oc new-project $GUID-nexus --display-name "Shared Nexus"
-oc policy add-role-to-user admin ${USER} -n ${GUID}-nexus
 
-oc annotate namespace ${GUID}-nexus openshift.io/requester=${USER} --overwrite
+
+#oc new-project $GUID-nexus --display-name "Shared Nexus"
+#oc policy add-role-to-user admin ${USER} -n ${GUID}-nexus
+
+#oc annotate namespace ${GUID}-nexus openshift.io/requester=${USER} --overwrite
 
 
 oc new-app sonatype/nexus3:latest
