@@ -38,7 +38,7 @@ mkdir $HOME/jenkins-slave-appdev
 #oc policy add-role-to-user admin ${USER} -n ${GUID}-jenkins
 
 #oc annotate namespace ${GUID}-jenkins openshift.io/requester=${USER} --overwrite
-oc new-project $GUID-jenkins
+oc project $GUID-jenkins
 oc new-app jenkins-persistent --param ENABLE_OAUTH=true --param MEMORY_LIMIT=2Gi --param VOLUME_CAPACITY=4Gi
 
 
@@ -52,7 +52,7 @@ RUN yum -y install skopeo apb && \
 USER 1001"  >  $HOME/jenkins-slave-appdev/Dockerfile
 
 ######  Set up three build configurations with pointers to the pipelines in the source code project. Each build configuration needs to point to the source code repository and the respective contextDir
-
+cd $HOME/jenkins-slave/appdev
 sudo docker build . -t docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appdev:v3.9
 sudo docker build . -t docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appuat:v3.9
 sudo docker build . -t docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appprod:v3.9
@@ -63,7 +63,6 @@ sudo docker build . -t docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenki
 #sudo docker push docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appdev:v3.9
 
 #####     Create a build configuration to build the custom Maven slave pod to include Skopeo
-
 skopeo copy --dest-tls-verify=false --dest-creds=$(oc whoami):$(oc whoami -t) docker-daemon:docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appdev:v3.9 docker://docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appdev:v3.9
 
 
