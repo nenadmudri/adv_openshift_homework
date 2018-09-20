@@ -19,7 +19,8 @@ echo "Setting up Parks Production Environment in project ${GUID}-parks-prod"
 
 ####     Grant the correct permissions for the ParksMap application to read back-end services (see the associated README file)
 
-oc new-project $GUID-parks-prod --display-name "Shared Parks Prod"
+#oc new-project $GUID-parks-prod --display-name "Shared Parks Prod"
+oc project $GUID-parks-prod 
 oc policy add-role-to-user admin ${USER} -n ${GUID}-parks-prod
 oc policy add-role-to-group system:image-puller system:serviceaccounts:${GUID}-parks-prod -n ${GUID}-parks-dev
 oc policy add-role-to-user edit system:serviceaccount:${GUID}-jenkins:jenkins -n ${GUID}-parks-prod

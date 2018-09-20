@@ -38,6 +38,7 @@ echo "Setting up Nexus in project $GUID-nexus"
 
 #oc annotate namespace ${GUID}-nexus openshift.io/requester=${USER} --overwrite
 
+oc project $GUID-nexus 
 
 oc new-app sonatype/nexus3:latest
 oc expose svc nexus3

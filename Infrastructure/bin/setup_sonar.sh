@@ -15,10 +15,11 @@ echo "Setting up Sonarqube in project $GUID-sonarqube"
 
 
 
-oc new-project $GUID-sonarqube --display-name "Shared Sonarqube"
-oc policy add-role-to-user admin ${USER} -n ${GUID}-sonarqube
+#oc new-project $GUID-sonarqube --display-name "Shared Sonarqube"
+#oc policy add-role-to-user admin ${USER} -n ${GUID}-sonarqube
 
 
+oc project $GUID-sonarqube 
 
 #####     Create a new PostgreSQL database
 

@@ -33,12 +33,12 @@ echo "Setting up Jenkins in project ${GUID}-jenkins from Git Repo ${REPO} for Cl
 
 mkdir $HOME/jenkins-slave-appdev
 
-oc new-project $GUID-jenkins  --display-name "Shared Jenkins"
+#oc new-project $GUID-jenkins  --display-name "Shared Jenkins"
 
-oc policy add-role-to-user admin ${USER} -n ${GUID}-jenkins
+#oc policy add-role-to-user admin ${USER} -n ${GUID}-jenkins
 
-oc annotate namespace ${GUID}-jenkins openshift.io/requester=${USER} --overwrite
-
+#oc annotate namespace ${GUID}-jenkins openshift.io/requester=${USER} --overwrite
+oc new-project $GUID-jenkins
 oc new-app jenkins-persistent --param ENABLE_OAUTH=true --param MEMORY_LIMIT=2Gi --param VOLUME_CAPACITY=4Gi
 
 

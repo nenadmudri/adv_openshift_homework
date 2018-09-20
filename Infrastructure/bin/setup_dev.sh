@@ -13,12 +13,14 @@ echo "Setting up Parks Development Environment in project ${GUID}-parks-dev"
 
 ######    Grant the correct permissions to the Jenkins service account
 
-oc new-project $GUID-parks-dev --display-name "Shared Parks Dev"
-oc policy add-role-to-user admin ${USER} -n ${GUID}-parks-dev
+#oc new-project $GUID-parks-dev --display-name "Shared Parks Dev"
+#oc policy add-role-to-user admin ${USER} -n ${GUID}-parks-dev
 
 #oc annotate namespace ${GUID}-parks-dev openshift.io/requester=${USER} --overwrite
 
 ######   Create ConfigMaps for configuration of the applications
+oc project $GUID-parks-dev 
+
 oc create configmap mongodb-configmap        --from-literal=DB_HOST=mongodb    --from-literal=DB_PORT=27017   --from-literal=DB_USERNAME=mongodb     --from-literal=DB_PASSWORD=mongodb   --from-literal=DB_NAME=parks   --from-literal=DB_REPLICASET=rs0
 
 oc create configmap nationalparks-config     --from-literal=APPNAME="National Parks (Dev)"   
