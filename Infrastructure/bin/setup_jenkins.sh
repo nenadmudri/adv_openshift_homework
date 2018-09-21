@@ -27,6 +27,11 @@ echo "Setting up Jenkins in project ${GUID}-jenkins from Git Repo ${REPO} for Cl
 # * CLUSTER: the base url of the cluster used (e.g. na39.openshift.opentlc.com)
 
 
+##### Update nexus_settings file with right GUID and CLUSTER
+
+sed -i "s/GUID/${GUID}/"     $HOME/advdev_home_template/nexus_settings.xml
+sed -i "s/CLUSTER{$CLUSTER}/"   $HOME/advdev_home_template/nexus_settings.xml
+
 
 #####Create a Jenkins instance with persistent storage and sufficient resources
 
