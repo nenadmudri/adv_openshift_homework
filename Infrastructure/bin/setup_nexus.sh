@@ -41,23 +41,12 @@ echo "Create a new Nexus instance from template"
 oc project $GUID-nexus 
 
 oc new-app sonatype/nexus3:latest
-
-#oc new-app -f ./Infrastructure/templates/nexus.yml -n "${GUID}-nexus"
-
-while : ; do
- echo "Checking if Nexus is Ready..."
-    oc get pod -n ${GUID}-nexus | grep '\-1\-' | grep -v deploy | grep "1/1"
-    if [ $? == "1" ] 
-      then 
-      echo "...no. Sleeping 10 seconds."
-        sleep 10
-      else 
-        break 
-    fi
-done
-
 oc expose svc nexus3
 oc rollout pause dc nexus3
+echo 'Pause nexus deployment'
+#oc new-app -f ./Infrastructure/templates/nexus.yml -n "${GUID}-nexus"
+
+
 
 #####    Configure Nexus appropriately for resources, deployment strategy, persistent volumes, and readiness and liveness probes
 
@@ -82,12 +71,22 @@ oc set probe dc/nexus3 --readiness --failure-threshold 3 --initial-delay-seconds
 oc rollout resume dc nexus3
 
 #sleep 350
+while : ; do
+ echo "Checking if Nexus is Ready..."
+    oc get pod -n ${GUID}-nexus | grep '\-1\-' | grep -v deploy | grep "1/1"
+    if [ $? == "1" ] 
+      then 
+      echo "...no. Sleeping 10 seconds."
+        sleep 10
+      else 
+        break 
+    fi
+done
 
- 
 
 ######     When Nexus is running, populate Nexus with the correct repositories
 
-
+echo 'When Nexus is running, populate Nexus with the correct repositories'
 curl -o setup_nexus3.sh -s https://raw.githubusercontent.com/wkulhanek/ocp_advanced_development_resources/master/nexus/setup_nexus3.sh
 chmod +x setup_nexus3.sh
 ./setup_nexus3.sh admin admin123 http://$(oc get route nexus3 --template='{{ .spec.host }}')
