@@ -68,12 +68,15 @@ while : ; do
      echo "Checking if Jenkins-app-slave is completed..."
     if [ $? == "0" ] 
       then 
-      echo "Wait 10 seconds..."
-        sleep 10
+        echo 'jenkins-slave-appdev build completed'
+        break
       else 
-        break 
+        echo '...sleep 10 seconds....'
+        sleep 10
     fi
 done
+
+    
 
 # Deploy on DEV
 #cd  jenkins-slave-appdev
