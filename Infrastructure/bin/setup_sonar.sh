@@ -19,5 +19,5 @@ echo "Setting up Sonarqube in project $GUID-sonarqube"
 
 
 oc project $GUID-sonarqube 
-oc new-app -f ./Infrastructure/templates/sonarqube.yml --param=SONARQUBE_IMAGE=docker.io/wkulhanek/sonarqube \
-  --param=SONARQUBE_VERSION=7.3 -n "${GUID}-sonarqube"
+
+oc process -f Infrastructure/templates/sonarqube.yml -n ${GUID}-sonarqube -p GUID=${GUID} | oc create -n ${GUID}-sonarqube -f -
