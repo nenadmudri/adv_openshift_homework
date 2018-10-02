@@ -31,8 +31,8 @@ echo "Setting up Jenkins in project ${GUID}-jenkins from Git Repo ${REPO} for Cl
 
 ##### Update nexus_settings file with right GUID and CLUSTER
 
-sed -i "s/GUID/${GUID}/"     $HOME/advdev_home_template/nexus_settings.xml
-sed -i "s/CLUSTER{$CLUSTER}/"   $HOME/advdev_home_template/nexus_settings.xml
+sed -i "s/GUID/${GUID}/"     nexus_settings.xml
+sed -i "s/CLUSTER{$CLUSTER}/"   nexus_settings.xml
 
 
 #####Create a Jenkins instance with persistent storage and sufficient resources
