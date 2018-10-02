@@ -40,9 +40,9 @@ echo "Create a new Nexus instance from template"
 
 oc project $GUID-nexus 
 
-#oc new-app sonatype/nexus3:latest
+oc new-app sonatype/nexus3:latest
 
-oc new-app -f ./Infrastructure/templates/nexus.yml -n "${GUID}-nexus"
+#oc new-app -f ./Infrastructure/templates/nexus.yml -n "${GUID}-nexus"
 
 while : ; do
  echo "Checking if Nexus is Ready..."
@@ -61,21 +61,21 @@ oc rollout pause dc nexus3
 
 #####    Configure Nexus appropriately for resources, deployment strategy, persistent volumes, and readiness and liveness probes
 
-#oc patch dc nexus3 --patch='{ "spec": { "strategy": { "type": "Recreate" }}}'
-#oc set resources dc nexus3 --limits=memory=2Gi --requests=memory=1Gi
+oc patch dc nexus3 --patch='{ "spec": { "strategy": { "type": "Recreate" }}}'
+oc set resources dc nexus3 --limits=memory=2Gi --requests=memory=1Gi
 
-#echo "apiVersion: v1
-#kind: PersistentVolumeClaim
-#metadata:
-#  name: nexus-pvc
-#spec:
- # accessModes:
- # - ReadWriteOnce
- # resources:
- #   requests:
- #     storage: 4Gi" | oc create -f -
+echo "apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nexus-pvc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 4Gi" | oc create -f -
 
-#oc set volume dc/nexus3 --add --overwrite --name=nexus3-volume-1 --mount-path=/nexus-data/ --type persistentVolumeClaim --claim-name=nexus-pvc
+oc set volume dc/nexus3 --add --overwrite --name=nexus3-volume-1 --mount-path=/nexus-data/ --type persistentVolumeClaim --claim-name=nexus-pvc
 oc set probe dc/nexus3 --liveness --failure-threshold 3 --initial-delay-seconds 60 -- echo ok
 oc set probe dc/nexus3 --readiness --failure-threshold 3 --initial-delay-seconds 60 --get-url=http://:8081/repository/maven-public/
 
