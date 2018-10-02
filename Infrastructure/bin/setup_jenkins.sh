@@ -7,7 +7,6 @@ if [ "$#" -ne 3 ]; then
     exit 1
 fi
 
-exit
 
 
 GUID=$1
@@ -32,14 +31,14 @@ echo "Setting up Jenkins in project ${GUID}-jenkins from Git Repo ${REPO} for Cl
 
 ##### Update nexus_settings file with right GUID and CLUSTER
 
-sed -i "s/GUID/${GUID}/"     nexus_settings.xml
-sed -i "s/CLUSTER{$CLUSTER}/"   nexus_settings.xml
+#sed -i "s/GUID/${GUID}/"     nexus_settings.xml
+#sed -i "s/CLUSTER{$CLUSTER}/"   nexus_settings.xml
 
 
 #####Create a Jenkins instance with persistent storage and sufficient resources
 
 
-mkdir jenkins-slave-appdev
+#mkdir jenkins-slave-appdev
 
 #oc new-project $GUID-jenkins  --display-name "Shared Jenkins"
 
@@ -49,21 +48,47 @@ mkdir jenkins-slave-appdev
 oc project $GUID-jenkins
 oc new-app jenkins-persistent --param ENABLE_OAUTH=true --param MEMORY_LIMIT=2Gi --param VOLUME_CAPACITY=4Gi
 
+while : ; do
+    oc get pod -n ${GUID}-jenkins | grep -v deploy | grep "1/1"
+    echo "Checking if Nexus is Ready..."
+    if [ $? == "1" ] 
+      then 
+      echo "Wait 10 seconds..."
+        sleep 10
+      else 
+        break 
+    fi
+done
+
+
+oc new-build --name=jenkins-slave-appdev --dockerfile=$'FROM docker.io/openshift/jenkins-slave-maven-centos7:v3.9\nUSER root\nRUN yum -y install skopeo apb && \yum clean all\nUSER 1001' -n ${GUID}-jenkins
+
+while : ; do
+      oc get pod -n ${GUID}-jenkins | grep 'slave' | grep "Completed"
+     echo "Checking if Jenkins-app-slave is completed..."
+    if [ $? == "0" ] 
+      then 
+      echo "Wait 10 seconds..."
+        sleep 10
+      else 
+        break 
+    fi
+done
 
 # Deploy on DEV
-cd  jenkins-slave-appdev
+#cd  jenkins-slave-appdev
 
-echo "FROM docker.io/openshift/jenkins-slave-maven-centos7:v3.9
-USER root
-RUN yum -y install skopeo apb && \
-    yum clean all
-USER 1001"  >  jenkins-slave-appdev/Dockerfile
+#echo "FROM docker.io/openshift/jenkins-slave-maven-centos7:v3.9
+#USER root
+#RUN yum -y install skopeo apb && \
+#    yum clean all
+#USER 1001"  >  jenkins-slave-appdev/Dockerfile
 
 ######  Set up three build configurations with pointers to the pipelines in the source code project. Each build configuration needs to point to the source code repository and the respective contextDir
-cd jenkins-slave-appdev
-docker build . -t docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appdev:v3.9
-docker build . -t docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appuat:v3.9
-docker build . -t docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appprod:v3.9
+#cd jenkins-slave-appdev
+#docker build . -t docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appdev:v3.9
+#docker build . -t docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appuat:v3.9
+#docker build . -t docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appprod:v3.9
 
 #sudo docker login -u $GUID -p $(oc whoami -t) docker-registry-default.apps.$CLUSTER
 
@@ -71,6 +96,6 @@ docker build . -t docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-sl
 #sudo docker push docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appdev:v3.9
 
 #####     Create a build configuration to build the custom Maven slave pod to include Skopeo
-skopeo copy --dest-tls-verify=false --dest-creds=$(oc whoami):$(oc whoami -t) docker-daemon:docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appdev:v3.9 docker://docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appdev:v3.9
+#skopeo copy --dest-tls-verify=false --dest-creds=$(oc whoami):$(oc whoami -t) docker-daemon:docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appdev:v3.9 docker://docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appdev:v3.9
 
 
