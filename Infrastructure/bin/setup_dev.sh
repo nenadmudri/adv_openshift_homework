@@ -6,7 +6,7 @@ if [ "$#" -ne 1 ]; then
     exit 1
 fi
 
-exit
+
 
 GUID=$1
 echo "Setting up Parks Development Environment in project ${GUID}-parks-dev"
