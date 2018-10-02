@@ -5,7 +5,8 @@ if [ "$#" -ne 1 ]; then
     echo "  $0 GUID"
     exit 1
 fi
-exit
+
+
 GUID=$1
 echo "Setting up Sonarqube in project $GUID-sonarqube"
 
@@ -25,7 +26,7 @@ oc project $GUID-sonarqube
 
 
 #oc annotate namespace ${GUID}-sonarqube openshift.io/requester=${USER} --overwrite
-sudo docker pull registry.access.redhat.com/openshift3/mongodb-24-rhel7
+docker pull registry.access.redhat.com/openshift3/mongodb-24-rhel7
 #oc new-app --template=postgresql-persistent --param POSTGRESQL_USER=sonar --param POSTGRESQL_PASSWORD=sonar --param POSTGRESQL_DATABASE=sonar --param VOLUME_CAPACITY=4Gi --labels=app=sonarqube_db
 oc new-app --template=postgresql-persistent --param POSTGRESQL_USER=sonar --param POSTGRESQL_PASSWORD=sonar --param POSTGRESQL_DATABASE=sonar --param VOLUME_CAPACITY=4Gi --labels=app=sonarqube_db -n $GUID-sonarqube
 
