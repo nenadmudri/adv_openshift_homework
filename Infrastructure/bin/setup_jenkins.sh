@@ -38,7 +38,7 @@ sed -i "s/CLUSTER{$CLUSTER}/"   $HOME/advdev_home_template/nexus_settings.xml
 #####Create a Jenkins instance with persistent storage and sufficient resources
 
 
-mkdir $HOME/jenkins-slave-appdev
+mkdir jenkins-slave-appdev
 
 #oc new-project $GUID-jenkins  --display-name "Shared Jenkins"
 
@@ -50,16 +50,16 @@ oc new-app jenkins-persistent --param ENABLE_OAUTH=true --param MEMORY_LIMIT=2Gi
 
 
 # Deploy on DEV
-cd  ./jenkins-slave-appdev
+cd  jenkins-slave-appdev
 
 echo "FROM docker.io/openshift/jenkins-slave-maven-centos7:v3.9
 USER root
 RUN yum -y install skopeo apb && \
     yum clean all
-USER 1001"  >  $HOME/jenkins-slave-appdev/Dockerfile
+USER 1001"  >  jenkins-slave-appdev/Dockerfile
 
 ######  Set up three build configurations with pointers to the pipelines in the source code project. Each build configuration needs to point to the source code repository and the respective contextDir
-cd ./jenkins-slave/appdev
+cd jenkins-slave-appdev
 docker build . -t docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appdev:v3.9
 docker build . -t docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appuat:v3.9
 docker build . -t docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appprod:v3.9
