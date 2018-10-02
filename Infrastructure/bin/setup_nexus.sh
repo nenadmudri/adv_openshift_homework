@@ -31,7 +31,7 @@ echo "Setting up Nexus in project $GUID-nexus"
 
 
 ######## Create a new Nexus instance from docker.io/sonatype/nexus3:latest
-echo "Create a new Nexus instance from docker.io/sonatype/nexus3:latest"
+echo "Create a new Nexus instance from template"
 
 #oc new-project $GUID-nexus --display-name "Shared Nexus"
 #oc policy add-role-to-user admin ${USER} -n ${GUID}-nexus
@@ -40,8 +40,9 @@ echo "Create a new Nexus instance from docker.io/sonatype/nexus3:latest"
 
 oc project $GUID-nexus 
 
-oc new-app sonatype/nexus3:latest
+#oc new-app sonatype/nexus3:latest
 
+oc new-app -f ./Infrastructure/templates/nexus.yml -n "${GUID}-nexus"
 
 while : ; do
  echo "Checking if Nexus is Ready..."
