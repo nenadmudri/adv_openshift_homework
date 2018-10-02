@@ -44,13 +44,14 @@ oc new-app sonatype/nexus3:latest
 
 
 while : ; do
-   echo "Checking if Nexus is Ready..."
-   oc get pod -n ${GUID}-nexus|grep '\-2\-'|grep -v deploy|grep "1/1"
-   [[ "$?" == "1" ]] || break
-   echo "...no. Sleeping 60 seconds."
-   sleep 60
- done
-
+    oc get pod -n ${GUID}-nexus | grep '\-1\-' | grep -v deploy | grep "1/1"
+    if [ $? == "1" ] 
+      then 
+        sleep 10
+      else 
+        break 
+    fi
+done
 
 oc expose svc nexus3
 oc rollout pause dc nexus3
