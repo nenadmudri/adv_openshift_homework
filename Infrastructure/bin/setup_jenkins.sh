@@ -50,7 +50,7 @@ oc new-app jenkins-persistent --param ENABLE_OAUTH=true --param MEMORY_LIMIT=2Gi
 
 
 # Deploy on DEV
-cd  $HOME/jenkins-slave-appdev
+cd  ./jenkins-slave-appdev
 
 echo "FROM docker.io/openshift/jenkins-slave-maven-centos7:v3.9
 USER root
@@ -59,10 +59,10 @@ RUN yum -y install skopeo apb && \
 USER 1001"  >  $HOME/jenkins-slave-appdev/Dockerfile
 
 ######  Set up three build configurations with pointers to the pipelines in the source code project. Each build configuration needs to point to the source code repository and the respective contextDir
-cd $HOME/jenkins-slave/appdev
-sudo docker build . -t docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appdev:v3.9
-sudo docker build . -t docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appuat:v3.9
-sudo docker build . -t docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appprod:v3.9
+cd ./jenkins-slave/appdev
+docker build . -t docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appdev:v3.9
+docker build . -t docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appuat:v3.9
+docker build . -t docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appprod:v3.9
 
 #sudo docker login -u $GUID -p $(oc whoami -t) docker-registry-default.apps.$CLUSTER
 
@@ -70,6 +70,6 @@ sudo docker build . -t docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenki
 #sudo docker push docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appdev:v3.9
 
 #####     Create a build configuration to build the custom Maven slave pod to include Skopeo
-sudo skopeo copy --dest-tls-verify=false --dest-creds=$(oc whoami):$(oc whoami -t) docker-daemon:docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appdev:v3.9 docker://docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appdev:v3.9
+skopeo copy --dest-tls-verify=false --dest-creds=$(oc whoami):$(oc whoami -t) docker-daemon:docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appdev:v3.9 docker://docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appdev:v3.9
 
 
