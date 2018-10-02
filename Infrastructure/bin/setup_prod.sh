@@ -5,7 +5,7 @@ if [ "$#" -ne 1 ]; then
     echo "  $0 GUID"
     exit 1
 fi
-
+exit
 GUID=$1
 echo "Setting up Parks Production Environment in project ${GUID}-parks-prod"
 
