@@ -104,7 +104,6 @@ objects:
         from:
           kind: ImageStreamTag
           name: nexus3:latest
-          namespace: ${GUID}-nexus
       type: ImageChange
 - apiVersion: v1
   kind: Service
