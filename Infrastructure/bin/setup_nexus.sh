@@ -29,7 +29,7 @@ echo "Setting up Nexus in project $GUID-nexus"
 # oc new-app -f ../templates/nexus.yaml --param .....
 
 oc project $GUID-nexus 
-oc process -f Infrastructure/templates/nexus-template.yaml -n ${GUID}-nexus -p GUID=${GUID} | oc create -n ${GUID}-nexus -f -
+oc process -f Infrastructure/templates/nexus.yml -n ${GUID}-nexus -p GUID=${GUID} | oc create -n ${GUID}-nexus -f -
 oc expose svc nexus3 -n ${GUID}-nexus
 oc expose svc nexus-registry -n ${GUID}-nexus
 
