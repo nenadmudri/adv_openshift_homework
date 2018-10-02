@@ -31,7 +31,7 @@ echo "Setting up Nexus in project $GUID-nexus"
 
 
 ######## Create a new Nexus instance from docker.io/sonatype/nexus3:latest
-
+echo "Create a new Nexus instance from docker.io/sonatype/nexus3:latest"
 
 #oc new-project $GUID-nexus --display-name "Shared Nexus"
 #oc policy add-role-to-user admin ${USER} -n ${GUID}-nexus
@@ -41,6 +41,17 @@ echo "Setting up Nexus in project $GUID-nexus"
 oc project $GUID-nexus 
 
 oc new-app sonatype/nexus3:latest
+
+
+while : ; do
+   echo "Checking if Nexus is Ready..."
+   oc get pod -n ${GUID}-nexus|grep '\-2\-'|grep -v deploy|grep "1/1"
+   [[ "$?" == "1" ]] || break
+   echo "...no. Sleeping 60 seconds."
+   sleep 60
+ done
+
+
 oc expose svc nexus3
 oc rollout pause dc nexus3
 
@@ -68,14 +79,7 @@ oc rollout resume dc nexus3
 
 #sleep 350
 
- while : ; do
-   echo "Checking if Nexus is Ready..."
-   oc get pod -n ${GUID}-nexus|grep '\-2\-'|grep -v deploy|grep "1/1"
-   [[ "$?" == "1" ]] || break
-   echo "...no. Sleeping 60 seconds."
-   sleep 60
- done
-
+ 
 
 ######     When Nexus is running, populate Nexus with the correct repositories
 
