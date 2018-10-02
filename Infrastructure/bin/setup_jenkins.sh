@@ -7,6 +7,7 @@ if [ "$#" -ne 3 ]; then
     exit 1
 fi
 
+exit
 
 
 GUID=$1
