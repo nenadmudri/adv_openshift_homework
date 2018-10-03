@@ -1,0 +1,8 @@
+    contextDir: Nationalparks
+    type: Git
+    git:
+      uri: "https://github.com/berrutig/advdev_homework.git"
+      uri: "https://github.com/berrutig/advdev_homework_template.git"
+      ref: "master"
+  strategy:
+    jenkinsPipelineStrategy:
