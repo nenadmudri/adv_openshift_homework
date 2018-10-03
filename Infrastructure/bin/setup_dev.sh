@@ -17,14 +17,14 @@ echo "Setting up Parks Development Environment in project ${GUID}-parks-dev"
 
 # Compile all projects
 
-cd $HOME/advdev_homework_template/Nationalparks
-mvn -s ../nexus_settings.xml clean package -Dmaven.test.skip=true
+#cd $HOME/advdev_homework_template/Nationalparks
+#mvn -s ../nexus_settings.xml clean package -Dmaven.test.skip=true
 
-cd $HOME/advdev_homework_template/MLBParks
-mvn -s ../nexus_settings.xml clean package -Dmaven.test.skip=true
+#cd $HOME/advdev_homework_template/MLBParks
+#mvn -s ../nexus_settings.xml clean package -Dmaven.test.skip=true
 
-cd $HOME/advdev_homework_template/ParksMap
-mvn -s ../nexus_settings.xml clean package spring-boot:repackage -DskipTests -Dcom.redhat.xpaas.repo.redhatga
+#cd $HOME/advdev_homework_template/ParksMap
+#mvn -s ../nexus_settings.xml clean package spring-boot:repackage -DskipTests -Dcom.redhat.xpaas.repo.redhatga
 
 
 ######    Grant the correct permissions to the Jenkins service account
