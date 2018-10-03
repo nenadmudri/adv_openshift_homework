@@ -79,9 +79,9 @@ done
 
 oc create configmap basic-config --from-literal="GUID=${GUID}" --from-literal="REPO=${REPO}" --from-literal="CLUSTER=${CLUSTER}"
 
-oc create -f Infrastructure/templates/bc-mlbparks.yml -n ${GUID}-jenkins
-oc create -f Infrastructure/templates/bc-nationalparks.yml -n ${GUID}-jenkins
-oc create -f Infrastructure/templates/bc-parksmap.yml -n ${GUID}-jenkins
+oc create -f Infrastructure/templates/bl-mlbparks.yml -n ${GUID}-jenkins
+oc create -f Infrastructure/templates/bl-nationalparks.yml -n ${GUID}-jenkins
+oc create -f Infrastructure/templates/bl-parksmap.yml -n ${GUID}-jenkins
 
 oc set env bc/mlbparks-pipeline GUID=${GUID} REPO=${REPO} CLUSTER=${CLUSTER} -n ${GUID}-jenkins
 oc set env bc/nationalparks-pipeline GUID=${GUID} REPO=${REPO} CLUSTER=${CLUSTER} -n ${GUID}-jenkins
