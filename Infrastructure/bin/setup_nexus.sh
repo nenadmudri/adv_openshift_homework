@@ -35,7 +35,7 @@ oc expose svc nexus-registry -n ${GUID}-nexus
 
 while : ; do
  echo "Checking if Nexus is Ready..."
-    echo 'Pods'  | oc get pods | grep nexus
+  
     oc get pod -n ${GUID}-nexus | grep '\-1\-' | grep -v deploy | grep "1/1"
     if [ $? == "1" ] 
       then 
