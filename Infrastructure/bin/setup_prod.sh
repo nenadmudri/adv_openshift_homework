@@ -5,7 +5,7 @@ if [ "$#" -ne 1 ]; then
     echo "  $0 GUID"
     exit 1
 fi
-exit
+
 GUID=$1
 echo "Setting up Parks Production Environment in project ${GUID}-parks-prod"
 
@@ -48,7 +48,7 @@ oc create configmap g-parksmap-config     --from-literal=APPNAME="ParksMap (Gree
 
 
 #sudo docker pull registry.access.redhat.com/openshift3/mongodb-24-rhel7
-sudo docker pull registry.access.redhat.com/rhscl/mongodb-26-rhel7
+#sudo docker pull registry.access.redhat.com/rhscl/mongodb-26-rhel7
 #oc new-app --name=mongodb  -e MONGODB_USER=mongodb MONGODB_PASSWORD=mongodb MONGODB_DATABASE=mongodb MONGODB_ADMIN_PASSWORD=mongodb registry.access.redhat.com/rhscl/mongodb-26-rhel7
 #oc new-app --name=mongodb -e MONGODB_USER=mongodb -e MONGODB_PASSWORD=mongodb -e MONGODB_DATABASE=parks -e MONGODB_ADMIN_PASSWORD=mongodb    registry.access.redhat.com/rhs
 #cl/mongodb-26-rhel7
