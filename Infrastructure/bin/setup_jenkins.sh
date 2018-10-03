@@ -76,28 +76,34 @@ while : ; do
     fi
 done
 
-    
+
+oc create configmap basic-config --from-literal="GUID=${GUID}" --from-literal="REPO=${REPO}" --from-literal="CLUSTER=${CLUSTER}"
+
+oc create -f Infrastructure/templates/bc-mlbparks.yaml -n ${GUID}-jenkins
+oc create -f Infrastructure/templates/bc-nationalparks.yaml -n ${GUID}-jenkins
+oc create -f Infrastructure/templates/bc-parksmap.yaml -n ${GUID}-jenkins
+
+oc set env bc/mlbparks-pipeline GUID=${GUID} REPO=${REPO} CLUSTER=${CLUSTER} -n ${GUID}-jenkins
+oc set env bc/nationalparks-pipeline GUID=${GUID} REPO=${REPO} CLUSTER=${CLUSTER} -n ${GUID}-jenkins
+oc set env bc/parksmap-pipeline GUID=${GUID} REPO=${REPO} CLUSTER=${CLUSTER} -n ${GUID}-jenkins
+
+
+
 
 # Deploy on DEV
 #cd  jenkins-slave-appdev
-
 #echo "FROM docker.io/openshift/jenkins-slave-maven-centos7:v3.9
 #USER root
 #RUN yum -y install skopeo apb && \
 #    yum clean all
 #USER 1001"  >  jenkins-slave-appdev/Dockerfile
-
 ######  Set up three build configurations with pointers to the pipelines in the source code project. Each build configuration needs to point to the source code repository and the respective contextDir
 #cd jenkins-slave-appdev
 #docker build . -t docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appdev:v3.9
 #docker build . -t docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appuat:v3.9
 #docker build . -t docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appprod:v3.9
-
 #sudo docker login -u $GUID -p $(oc whoami -t) docker-registry-default.apps.$CLUSTER
-
-
 #sudo docker push docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appdev:v3.9
-
 #####     Create a build configuration to build the custom Maven slave pod to include Skopeo
 #skopeo copy --dest-tls-verify=false --dest-creds=$(oc whoami):$(oc whoami -t) docker-daemon:docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appdev:v3.9 docker://docker-registry-default.apps.$CLUSTER/$GUID-jenkins/jenkins-slave-maven-appdev:v3.9
 
