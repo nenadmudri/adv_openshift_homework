@@ -67,7 +67,7 @@ while : ; do
 
 echo "Checking if Jenkins-app-slave is completed..."
      
-bash -x oc get pod -n ${GUID}-jenkins | grep 'slave' | grep "Completed"
+oc get pod -n ${GUID}-jenkins | grep 'slave' | grep "Completed"
      
     if [ $? == "0" ] 
       then 
