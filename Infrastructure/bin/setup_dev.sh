@@ -48,7 +48,7 @@ oc create configmap parksmap-config     --from-literal=APPNAME="ParksMap (Dev)"
 
 #####   Create a MongoDB database
 #sudo docker pull registry.access.redhat.com/openshift3/mongodb-24-rhel7
-sudo docker pull registry.access.redhat.com/rhscl/mongodb-26-rhel7
+#sudo docker pull registry.access.redhat.com/rhscl/mongodb-26-rhel7
 #oc new-app --name=mongodb  -e MONGODB_USER=mongodb MONGODB_PASSWORD=mongodb MONGODB_DATABASE=mongodb MONGODB_ADMIN_PASSWORD=mongodb registry.access.redhat.com/rhscl/mongodb-26-rhel7
 #oc new-app --name=mongodb -e MONGODB_USER=mongodb -e MONGODB_PASSWORD=mongodb -e MONGODB_DATABASE=parks -e MONGODB_ADMIN_PASSWORD=mongodb    registry.access.redhat.com/rhscl/mongodb-26-rhel7
 oc new-app mongodb-persistent --name=mongodb        
@@ -80,20 +80,22 @@ oc new-build --binary=true --strategy=source --name=parksmap redhat-openjdk18-op
 oc policy add-role-to-user view --serviceaccount=default
 
 
-oc start-build mlbparks --from-file=$HOME/advdev_homework_template/MLBParks/target/mlbparks.war --follow
-oc new-app $GUID-parks-dev/mlbparks:latest -e APPNAME="MLB Parks (Dev)" --name=mlbparks 
-
-oc start-build nationalparks --from-file=$HOME/advdev_homework_template/Nationalparks/target/nationalparks.jar --follow
-oc new-app $GUID-parks-dev/nationalparks:latest -e APPNAME="National Parks (Dev)" --name=nationalparks  
+#oc start-build mlbparks --from-file=$HOME/advdev_homework_template/MLBParks/target/mlbparks.war --follow
+#oc new-app $GUID-parks-dev/mlbparks:latest -e APPNAME="MLB Parks (Dev)" --name=mlbparks 
+oc new-app $GUID-parks-dev/mlbparks:0.0 -e APPNAME="MLB Parks (Dev)" --name=mlbparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
 
 
-oc start-build parksmap --from-file=$HOME/advdev_homework_template/ParksMap/target/parksmap.jar --follow
-oc new-app $GUID-parks-dev/parksmap:latest -e APPNAME="ParksMap (Dev)" --name=parksmap  
+#oc start-build nationalparks --from-file=$HOME/advdev_homework_template/Nationalparks/target/nationalparks.jar --follow
+#oc new-app $GUID-parks-dev/nationalparks:latest -e APPNAME="National Parks (Dev)" --name=nationalparks  
+oc new-app $GUID-parks-dev/nationalparks:0.0 -e APPNAME="National Parks (Dev)" --name=nationalparks  --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
 
 
-#oc new-app $GUID-parks-dev/mlbparks:0.0-0 -t configmap --configmap-name=mlbparks-config --name=mlbparks --allow-missing-imagestream-tags=true
-#oc new-app $GUID-parks-dev/nationalparks:0.0-0 -t configmap --configmap-name=nationalparks-config --name=nationalparks --allow-missing-imagestream-tags=true
-#oc new-app $GUID-parks-dev/parksmap:0.0-0 -t configmap --configmap-name=parksmap-config --name=parksmap --allow-missing-imagestream-tags=true
+#oc start-build parksmap --from-file=$HOME/advdev_homework_template/ParksMap/target/parksmap.jar --follow
+#oc new-app $GUID-parks-dev/parksmap:latest -e APPNAME="ParksMap (Dev)" --name=parksmap  
+oc new-app $GUID-parks-dev/parksmap:0.0 -e APPNAME="ParksMap (Dev)" --name=parksmap  --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
+
+
+
 
 
 oc set triggers dc/mlbparks --remove-all
