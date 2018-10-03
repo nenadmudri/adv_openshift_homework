@@ -46,7 +46,7 @@ echo "Setting up Jenkins in project ${GUID}-jenkins from Git Repo ${REPO} for Cl
 
 #oc annotate namespace ${GUID}-jenkins openshift.io/requester=${USER} --overwrite
 oc project $GUID-jenkins
-oc new-app jenkins-persistent --param ENABLE_OAUTH=true --param MEMORY_LIMIT=2Gi --param VOLUME_CAPACITY=4Gi
+oc new-app -f ./Infrastructure/templates/jenkins.json --param ENABLE_OAUTH=true --param MEMORY_LIMIT=2Gi --param VOLUME_CAPACITY=4Gi --param CPU_LIMIT=1
 
 while : ; do
     oc get pod -n ${GUID}-jenkins | grep -v deploy | grep "1/1"
@@ -59,6 +59,7 @@ while : ; do
         break 
     fi
 done
+
 
 
 oc new-build --name=jenkins-slave-appdev --dockerfile=$'FROM docker.io/openshift/jenkins-slave-maven-centos7:v3.9\nUSER root\nRUN yum -y install skopeo apb && \yum clean all\nUSER 1001' -n ${GUID}-jenkins
