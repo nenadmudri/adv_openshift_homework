@@ -1,21 +1,24 @@
 apiVersion: v1
 kind: BuildConfig
 metadata:
-  name: nationalparks-pipeline
+  name: "nationalparks-pipeline"
 spec:
   source:
+    contextDir: MLBParks
     type: Git
     git:
-      uri: ${REPO}
-      ref: master
+      uri: "https://github.com/berrutig/adv_dev_homework_template"
+      ref: "master"
   strategy:
-    type: JenkinsPipeline
     jenkinsPipelineStrategy:
        env:
          - name: GUID
-           value: ${GUID}
+           valueFrom: 
+             configMapKeyRef:
+               name: basic-config
+               key: GUID
          - name: CLUSTER
-           value: ${CLUSTER}
-         - name: REPO
-           value: ${REPO}
-       jenkinsfilePath: Nationalparks/Jenkinsfile
+           valueFrom: 
+             configMapKeyRef:
+               name: basic-config
+               key: CLUSTER
