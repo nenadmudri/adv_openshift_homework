@@ -64,8 +64,11 @@ done
 oc new-build --name=jenkins-slave-appdev --dockerfile=$'FROM docker.io/openshift/jenkins-slave-maven-centos7:v3.9\nUSER root\nRUN yum -y install skopeo apb && \yum clean all\nUSER 1001' -n ${GUID}-jenkins
 
 while : ; do
-      oc get pod -n ${GUID}-jenkins | grep 'slave' | grep "Completed"
-     echo "Checking if Jenkins-app-slave is completed..."
+
+echo "Checking if Jenkins-app-slave is completed..."
+     
+bash -x oc get pod -n ${GUID}-jenkins | grep 'slave' | grep "Completed"
+     
     if [ $? == "0" ] 
       then 
         echo 'jenkins-slave-appdev build completed'
