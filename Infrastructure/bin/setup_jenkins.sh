@@ -50,7 +50,7 @@ oc new-app -f ./Infrastructure/templates/jenkins.json --param ENABLE_OAUTH=true 
 
 while : ; do
     oc get pod -n ${GUID}-jenkins | grep -v deploy | grep "1/1"
-    echo "Checking if Nexus is Ready..."
+    echo "Checking if Jenkins is Ready..."
     if [ $? == "1" ] 
       then 
       echo "Wait 10 seconds..."
