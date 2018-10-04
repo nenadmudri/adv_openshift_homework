@@ -63,8 +63,40 @@ oc create configmap g-parksmap-config     --from-literal=APPNAME="ParksMap (Gree
 #oc new-app --name=mongodb  -e MONGODB_USER=mongodb MONGODB_PASSWORD=mongodb MONGODB_DATABASE=mongodb MONGODB_ADMIN_PASSWORD=mongodb registry.access.redhat.com/rhscl/mongodb-26-rhel7
 #oc new-app --name=mongodb -e MONGODB_USER=mongodb -e MONGODB_PASSWORD=mongodb -e MONGODB_DATABASE=parks -e MONGODB_ADMIN_PASSWORD=mongodb    registry.access.redhat.com/rhs
 #cl/mongodb-26-rhel7
-oc new-app mongodb-persistent --name=mongodb-p
-oc rollout pause dc/mongodb
+#oc new-app mongodb-persistent --name=mongodb-p
+#oc rollout pause dc/mongodb
+
+
+echo 'kind: Service
+apiVersion: v1
+metadata:
+  name: "mongodb-internal"
+  labels:
+    name: "mongodb"
+  annotations:
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+spec:
+  clusterIP: None
+  ports:
+    - name: mongodb
+      port: 27017
+  selector:
+    name: "mongodb"' | oc create -n ${GUID}-parks-prod -f -
+
+echo 'kind: Service
+apiVersion: v1
+metadata:
+  name: "mongodb"
+  labels:
+    name: "mongodb"
+spec:
+  ports:
+    - name: mongodb
+      port: 27017
+  selector:
+    name: "mongodb"' | oc create -n ${GUID}-parks-prod -f -
+    
+    
 
 oc set env dc/mongodb-p --from=configmap/park-prd-conf
 echo "apiVersion: "v1"
@@ -81,6 +113,19 @@ spec:
 
 oc set volume dc/mongodb-p --add --type=persistentVolumeClaim --name=mongo-pv --claim-name=mongo-pvc-prod --mount-path=/data --containers=*
 oc rollout resume dc/mongodb-p
+
+while : ; do
+    oc get pod -n ${GUID}-parks-prod | grep -v deploy | grep "1/1"
+    echo "Checking if MongoDB is Ready..."
+    if [ $? == "1" ] 
+      then 
+      echo "Wait 10 seconds..."
+        sleep 10
+      else 
+        break 
+    fi
+done
+
 
 # Now build all parks apps
 
