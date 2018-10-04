@@ -72,29 +72,29 @@ apiVersion: v1
 metadata:
   name: "mongodb-internal"
   labels:
-    name: "mongodb"
+    name: "mongodb-p"
   annotations:
     service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
 spec:
   clusterIP: None
   ports:
-    - name: mongodb
+    - name: mongodb-p
       port: 27017
   selector:
-    name: "mongodb"' | oc create -n ${GUID}-parks-prod -f -
+    name: "mongodb-p"' | oc create -n ${GUID}-parks-prod -f -
 
 echo 'kind: Service
 apiVersion: v1
 metadata:
-  name: "mongodb"
+  name: "mongodb-p"
   labels:
-    name: "mongodb"
+    name: "mongodb-p"
 spec:
   ports:
-    - name: mongodb
+    - name: mongodb-p
       port: 27017
   selector:
-    name: "mongodb"' | oc create -n ${GUID}-parks-prod -f -
+    name: "mongodb-p"' | oc create -n ${GUID}-parks-prod -f -
     
     
 
