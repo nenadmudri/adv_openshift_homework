@@ -47,9 +47,15 @@ echo "Setting up Jenkins in project ${GUID}-jenkins from Git Repo ${REPO} for Cl
 #oc annotate namespace ${GUID}-jenkins openshift.io/requester=${USER} --overwrite
 oc project $GUID-jenkins
 #oc new-app -f ./Infrastructure/templates/jenkins.json --param ENABLE_OAUTH=true --param MEMORY_LIMIT=2Gi --param VOLUME_CAPACITY=4Gi --param CPU_LIMIT=2
+#echo "Setting up Jenkins in project ${GUID}-jenkins from Git Repo ${REPO} for Cluster ${CLUSTER}"
+#oc -n $GUID-jenkins new-app -f Infrastructure/templates/jenkins.yml -p MEMORY_LIMIT=2Gi -p VOLUME_CAPACITY=4Gi
+#oc -n $GUID-jenkins rollout status dc/jenkins -w
+
 echo "Setting up Jenkins in project ${GUID}-jenkins from Git Repo ${REPO} for Cluster ${CLUSTER}"
-oc -n $GUID-jenkins new-app -f Infrastructure/templates/jenkins.yml -p MEMORY_LIMIT=2Gi -p VOLUME_CAPACITY=4Gi
-oc -n $GUID-jenkins rollout status dc/jenkins -w
+oc new-app jenkins-persistent --param ENABLE_OAUTH=true --param MEMORY_LIMIT=4Gi --param VOLUME_CAPACITY=4Gi -n ${GUID}-jenkins
+oc rollout pause dc jenkins -n ${GUID}-jenkins
+oc set resources dc jenkins --limits=memory=4Gi,cpu=2 --requests=memory=2Gi,cpu=1 -n ${GUID}-jenkins
+oc rollout resume dc jenkins -n ${GUID}-jenkins
 
 
 while : ; do
