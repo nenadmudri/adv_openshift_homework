@@ -98,7 +98,7 @@ spec:
     
     
 
-oc set env dc/mongodb-p --from=configmap/park-prd-conf
+oc set env dc/mongodb --from=configmap/park-prd-conf
 echo "apiVersion: "v1"
 kind: "PersistentVolumeClaim"
 metadata:
@@ -111,8 +111,8 @@ spec:
       storage: "2Gi"" | oc create -f -
 
 
-oc set volume dc/mongodb-p --add --type=persistentVolumeClaim --name=mongo-pv --claim-name=mongo-pvc-prod --mount-path=/data --containers=*
-oc rollout resume dc/mongodb-p
+oc set volume dc/mongodb --add --type=persistentVolumeClaim --name=mongo-pv --claim-name=mongo-pvc-prod --mount-path=/data --containers=*
+oc rollout resume dc/mongodb
 
 while : ; do
     oc get pod -n ${GUID}-parks-prod | grep -v deploy | grep "1/1"
@@ -176,6 +176,19 @@ oc new-app ${GUID}-parks-dev/parksmap:0.0 --name=g-parksmap --allow-missing-imag
 #oc new-app $GUID-parks-dev/mlbparks:0.0-0 -t configmap --configmap-name=mlbparks-config --name=mlbparks --allow-missing-imagestream-tags=true
 #oc new-app $GUID-parks-dev/nationalparks:0.0-0 -t configmap --configmap-name=nationalparks-config --name=nationalparks --allow-missing-imagestream-tags=true
 #oc new-app $GUID-parks-dev/parksmap:0.0-0 -t configmap --configmap-name=parksmap-config --name=parksmap --allow-missing-imagestream-tags=true
+
+
+while : ; do
+    oc get pod -n ${GUID}-parks-prod | grep -v deploy | grep "1/1"
+    echo "Checking if Apps are Ready..."
+    if [ $? == "1" ] 
+      then 
+      echo "Wait 10 seconds..."
+        sleep 10
+      else 
+        break 
+    fi
+done
 
 
 oc set triggers dc/b-mlbparks --remove-all
