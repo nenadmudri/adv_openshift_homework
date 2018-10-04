@@ -88,21 +88,32 @@ oc policy add-role-to-user view --serviceaccount=default
 ######   Set up blue and green instances for each of the three microservices
 
 
-oc start-build b-mlbparks --from-file=MLBParks/target/mlbparks.war --follow
-oc new-app $GUID-parks-prod/b-mlbparks:latest -e APPNAME="MLB Parks (Blue)" --name=b-mlbparks
-oc start-build g-mlbparks --from-file=$HOME/advdev_homework_template/MLBParks/target/mlbparks.war --follow
-oc new-app $GUID-parks-prod/g-mlbparks:latest -e APPNAME="MLB Parks (Green)" --name=g-mlbparks
+#oc start-build b-mlbparks --from-file=MLBParks/target/mlbparks.war --follow
+#oc new-app $GUID-parks-prod/b-mlbparks:latest -e APPNAME="MLB Parks (Blue)" --name=b-mlbparks
+#oc start-build g-mlbparks --from-file=$HOME/advdev_homework_template/MLBParks/target/mlbparks.war --follow
+#oc new-app $GUID-parks-prod/g-mlbparks:latest -e APPNAME="MLB Parks (Green)" --name=g-mlbparks
 
-oc start-build b-nationalparks --from-file=Nationalparks/target/nationalparks.jar --follow
-oc new-app $GUID-parks-prod/b-nationalparks:latest -e APPNAME="National Parks (Blue)" --name=b-nationalparks
-oc start-build g-nationalparks --from-file=Nationalparks/target/nationalparks.jar --follow
-oc new-app $GUID-parks-prod/g-nationalparks:latest -e APPNAME="National Parks (Green)" --name=g-nationalparks
+#oc start-build b-nationalparks --from-file=Nationalparks/target/nationalparks.jar --follow
+#oc new-app $GUID-parks-prod/b-nationalparks:latest -e APPNAME="National Parks (Blue)" --name=b-nationalparks
+#oc start-build g-nationalparks --from-file=Nationalparks/target/nationalparks.jar --follow
+#oc new-app $GUID-parks-prod/g-nationalparks:latest -e APPNAME="National Parks (Green)" --name=g-nationalparks
 
 
-oc start-build b-parksmap --from-file=ParksMap/target/parksmap.jar --follow
-oc new-app $GUID-parks-prod/b-parksmap:latest -e APPNAME="ParksMap (Blue)" --name=b-parksmap
-oc start-build g-parksmap --from-file=ParksMap/target/parksmap.jar --follow
-oc new-app $GUID-parks-prod/g-parksmap:latest -e APPNAME="ParksMap (Green)" --name=g-parksmap
+#oc start-build b-parksmap --from-file=ParksMap/target/parksmap.jar --follow
+#oc new-app $GUID-parks-prod/b-parksmap:latest -e APPNAME="ParksMap (Blue)" --name=b-parksmap
+#oc start-build g-parksmap --from-file=ParksMap/target/parksmap.jar --follow
+#oc new-app $GUID-parks-prod/g-parksmap:latest -e APPNAME="ParksMap (Green)" --name=g-parksmap
+
+
+
+
+oc new-app ${GUID}-parks-dev/mlbparks:0.0 --name=b-mlbparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
+oc new-app ${GUID}-parks-dev/nationalparks:0.0 --name=b-nationalparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
+oc new-app ${GUID}-parks-dev/parksmap:0.0 --name=b-parksmap --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
+
+oc new-app ${GUID}-parks-dev/mlbparks:0.0 --name=g-mlbparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
+oc new-app ${GUID}-parks-dev/nationalparks:0.0 --name=g-nationalparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
+oc new-app ${GUID}-parks-dev/parksmap:0.0 --name=g-parksmap --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
 
 
 
