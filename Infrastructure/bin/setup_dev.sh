@@ -82,20 +82,17 @@ oc policy add-role-to-user view --serviceaccount=default
 
 #oc start-build mlbparks --from-file=$HOME/advdev_homework_template/MLBParks/target/mlbparks.war --follow
 #oc new-app $GUID-parks-dev/mlbparks:latest -e APPNAME="MLB Parks (Dev)" --name=mlbparks 
-oc new-app $GUID-parks-dev/mlbparks:0.0 -e APPNAME="MLB Parks (Dev)" --name=mlbparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
+oc new-app $GUID-parks-dev/mlbparks:0.0-0 -e APPNAME="MLB Parks (Dev)" --name=mlbparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
 
 
 #oc start-build nationalparks --from-file=$HOME/advdev_homework_template/Nationalparks/target/nationalparks.jar --follow
 #oc new-app $GUID-parks-dev/nationalparks:latest -e APPNAME="National Parks (Dev)" --name=nationalparks  
-oc new-app $GUID-parks-dev/nationalparks:0.0 -e APPNAME="National Parks (Dev)" --name=nationalparks  --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
+oc new-app $GUID-parks-dev/nationalparks:0.0-0 -e APPNAME="National Parks (Dev)" --name=nationalparks  --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
 
 
 #oc start-build parksmap --from-file=$HOME/advdev_homework_template/ParksMap/target/parksmap.jar --follow
 #oc new-app $GUID-parks-dev/parksmap:latest -e APPNAME="ParksMap (Dev)" --name=parksmap  
-oc new-app $GUID-parks-dev/parksmap:0.0 -e APPNAME="ParksMap (Dev)" --name=parksmap  --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
-
-
-
+oc new-app $GUID-parks-dev/parksmap:0.0-0 -e APPNAME="ParksMap (Dev)" --name=parksmap  --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
 
 
 oc set triggers dc/mlbparks --remove-all
