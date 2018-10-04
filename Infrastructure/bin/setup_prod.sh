@@ -5,8 +5,8 @@ if [ "$#" -ne 1 ]; then
     echo "  $0 GUID"
     exit 1
 fi
-echo "Skipping production for now"
-exit
+#echo "Skipping production for now"
+#exit
 
 GUID=$1
 echo "Setting up Parks Production Environment in project ${GUID}-parks-prod"
@@ -34,8 +34,17 @@ oc policy add-role-to-user edit system:serviceaccount:${GUID}-jenkins:jenkins -n
 ######     Set up a replicated MongoDB database via StatefulSet with at least three replicas
 
 
-oc create configmap mongodb-prod-configmap        --from-literal=DB_HOST=mongodb-p    --from-literal=DB_PORT=27017   --from-literal=DB_USERNAME=mongodb-p     --from-literal=DB_PASSWORD=mongodb-p   --from-literal=DB_NAME=parks-prod   --from-literal=DB_REPLICASET=rs3
-
+#oc create configmap mongodb-prod-configmap        --from-literal=DB_HOST=mongodb-p    --from-literal=DB_PORT=27017   --from-literal=DB_USERNAME=mongodb-p     --from-literal=DB_PASSWORD=mongodb-p   --from-literal=DB_NAME=parks-prod   --from-literal=DB_REPLICASET=rs3
+# Config MongoDB configmap
+oc -n ${GUID}-parks-prod create configmap park-prd-conf \
+       --from-literal=DB_REPLICASET=rs0 \
+       --from-literal=DB_HOST=mongodb \
+       --from-literal=DB_PORT=27017 \
+       --from-literal=DB_USERNAME=mongodb \
+       --from-literal=DB_PASSWORD=mongodb \
+       --from-literal=DB_NAME=parks
+       
+       
 oc create configmap b-nationalparks-config     --from-literal=APPNAME="National Parks (Blue)"
 
 oc create configmap b-mlbparks-config     --from-literal=APPNAME="MLB Parks (Blue)"
@@ -57,7 +66,7 @@ oc create configmap g-parksmap-config     --from-literal=APPNAME="ParksMap (Gree
 oc new-app mongodb-persistent --name=mongodb-p
 oc rollout pause dc/mongodb
 
-oc set env dc/mongodb-p --from=configmap/mongodb-prod-configmap
+oc set env dc/mongodb-p --from=configmap/park-prd-conf
 echo "apiVersion: "v1"
 kind: "PersistentVolumeClaim"
 metadata:
