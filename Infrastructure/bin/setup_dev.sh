@@ -160,3 +160,5 @@ oc rollout latest dc/nationalparks -n $GUID-parks-dev
 oc set deployment-hook dc/mlbparks --post     -- curl -s http://mlbparks:8080/ws/data/load/
 
 oc rollout latest dc/mlbparks -n $GUID-parks-dev
+
+echo "Finished setting up dev"
