@@ -85,9 +85,9 @@ done
 
 # Now build all parks apps
 
-oc new-build --binary=true --strategy=source --name=mlbparks jboss-eap70-openshift:1.7 
-oc new-build --binary=true --strategy=source --name=nationalparks redhat-openjdk18-openshift:1.2
-oc new-build --binary=true --strategy=source --name=parksmap redhat-openjdk18-openshift:1.2
+oc new-build --binary=true  --name=mlbparks jboss-eap70-openshift:1.7 -n ${GUID}-parks-dev
+oc new-build --binary=true  --name=nationalparks redhat-openjdk18-openshift:1.2 -n ${GUID}-parks-dev
+oc new-build --binary=true  --name=parksmap redhat-openjdk18-openshift:1.2 -n ${GUID}-parks-dev
 
 #-t configmap --configmap-name=gogs
 oc policy add-role-to-user view --serviceaccount=default
@@ -109,6 +109,13 @@ oc policy add-role-to-user view --serviceaccount=default
 
 #create applications
 
+#oc new-app ${GUID}-parks-dev/mlbparks:0.0-0 --name=mlbparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
+
+#oc new-app ${GUID}-parks-dev/nationalparks:0.0-0 --name=nationalparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
+
+#oc new-app ${GUID}-parks-dev/parksmap:0.0-0 --name=parksmap --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
+
+#create app
 oc new-app ${GUID}-parks-dev/mlbparks:0.0-0 --name=mlbparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
 
 oc new-app ${GUID}-parks-dev/nationalparks:0.0-0 --name=nationalparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
