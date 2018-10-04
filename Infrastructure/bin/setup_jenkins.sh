@@ -46,7 +46,7 @@ echo "Setting up Jenkins in project ${GUID}-jenkins from Git Repo ${REPO} for Cl
 
 #oc annotate namespace ${GUID}-jenkins openshift.io/requester=${USER} --overwrite
 oc project $GUID-jenkins
-oc new-app -f ./Infrastructure/templates/jenkins.json --param ENABLE_OAUTH=true --param MEMORY_LIMIT=2Gi --param VOLUME_CAPACITY=4Gi --param CPU_LIMIT=1
+oc new-app -f ./Infrastructure/templates/jenkins.json --param ENABLE_OAUTH=true --param MEMORY_LIMIT=2Gi --param VOLUME_CAPACITY=4Gi --param CPU_LIMIT=2
 
 while : ; do
     oc get pod -n ${GUID}-jenkins | grep -v deploy | grep "1/1"
