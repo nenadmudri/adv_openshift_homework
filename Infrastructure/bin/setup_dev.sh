@@ -70,6 +70,19 @@ spec:
 oc set volume dc/mongodb --add --type=persistentVolumeClaim --name=mongo-pv --claim-name=mongo-pvc --mount-path=/data --containers=*
 oc rollout resume dc/mongodb
 
+while : ; do
+    oc get pod -n ${GUID}-parks-dev | grep -v deploy | grep "1/1"
+    echo "Checking if MongoDB is Ready..."
+    if [ $? == "1" ] 
+      then 
+      echo "Wait 10 seconds..."
+        sleep 10
+      else 
+        break 
+    fi
+done
+
+
 # Now build all parks apps
 
 oc new-build --binary=true --strategy=source --name=mlbparks jboss-eap70-openshift:1.7 
