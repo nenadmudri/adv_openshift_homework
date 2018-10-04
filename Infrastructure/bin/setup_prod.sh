@@ -52,10 +52,10 @@ oc create configmap g-parksmap-config     --from-literal=APPNAME="ParksMap (Gree
 #oc new-app --name=mongodb  -e MONGODB_USER=mongodb MONGODB_PASSWORD=mongodb MONGODB_DATABASE=mongodb MONGODB_ADMIN_PASSWORD=mongodb registry.access.redhat.com/rhscl/mongodb-26-rhel7
 #oc new-app --name=mongodb -e MONGODB_USER=mongodb -e MONGODB_PASSWORD=mongodb -e MONGODB_DATABASE=parks -e MONGODB_ADMIN_PASSWORD=mongodb    registry.access.redhat.com/rhs
 #cl/mongodb-26-rhel7
-oc new-app mongodb-persistent --name=mongodb
+oc new-app mongodb-persistent --name=mongodb-p
 oc rollout pause dc/mongodb
 
-oc set env dc/mongodb --from=configmap/mongodb-prod-configmap
+oc set env dc/mongodb-p --from=configmap/mongodb-prod-configmap
 echo "apiVersion: "v1"
 kind: "PersistentVolumeClaim"
 metadata:
@@ -68,8 +68,8 @@ spec:
       storage: "2Gi"" | oc create -f -
 
 
-oc set volume dc/mongodb --add --type=persistentVolumeClaim --name=mongo-pv --claim-name=mongo-pvc-prod --mount-path=/data --containers=*
-oc rollout resume dc/mongodb
+oc set volume dc/mongodb-p --add --type=persistentVolumeClaim --name=mongo-pv --claim-name=mongo-pvc-prod --mount-path=/data --containers=*
+oc rollout resume dc/mongodb-p
 
 # Now build all parks apps
 
