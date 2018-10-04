@@ -32,7 +32,7 @@ oc policy add-role-to-user edit system:serviceaccount:${GUID}-jenkins:jenkins -n
 ######     Set up a replicated MongoDB database via StatefulSet with at least three replicas
 
 
-oc create configmap mongodb-prod-configmap        --from-literal=DB_HOST=mongodb    --from-literal=DB_PORT=27017   --from-literal=DB_USERNAME=mongodb     --from-literal=DB_PASSWORD=mongodb   --from-literal=DB_NAME=parks-prod   --from-literal=DB_REPLICASET=rs3
+oc create configmap mongodb-prod-configmap        --from-literal=DB_HOST=mongodb-p    --from-literal=DB_PORT=27017   --from-literal=DB_USERNAME=mongodb-p     --from-literal=DB_PASSWORD=mongodb-p   --from-literal=DB_NAME=parks-prod   --from-literal=DB_REPLICASET=rs3
 
 oc create configmap b-nationalparks-config     --from-literal=APPNAME="National Parks (Blue)"
 
