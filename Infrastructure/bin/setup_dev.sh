@@ -51,10 +51,13 @@ oc create configmap parksmap-config     --from-literal=APPNAME="ParksMap (Dev)"
 #sudo docker pull registry.access.redhat.com/rhscl/mongodb-26-rhel7
 #oc new-app --name=mongodb  -e MONGODB_USER=mongodb MONGODB_PASSWORD=mongodb MONGODB_DATABASE=mongodb MONGODB_ADMIN_PASSWORD=mongodb registry.access.redhat.com/rhscl/mongodb-26-rhel7
 #oc new-app --name=mongodb -e MONGODB_USER=mongodb -e MONGODB_PASSWORD=mongodb -e MONGODB_DATABASE=parks -e MONGODB_ADMIN_PASSWORD=mongodb    registry.access.redhat.com/rhscl/mongodb-26-rhel7
-oc new-app mongodb-persistent --name=mongodb        
+#oc new-app mongodb-persistent --name=mongodb        
+oc new-app -e MONGODB_USER=mongodb -e MONGODB_PASSWORD=mongodb -e MONGODB_DATABASE=parks -e MONGODB_ADMIN_PASSWORD=mongodb --name=mongodb registry.access.redhat.com/rhscl/mongodb-34-rhel7:latest -n ${GUID}-parks-dev
+
 oc rollout pause dc/mongodb
 
-oc set env dc/mongodb --from=configmap/mongodb-configmap
+
+#oc set env dc/mongodb --from=configmap/mongodb-configmap
 echo "apiVersion: "v1"
 kind: "PersistentVolumeClaim"
 metadata:
@@ -170,9 +173,9 @@ oc set probe dc/parksmap --liveness      --initial-delay-seconds 30 --failure-th
 ######   Configure the deployment configurations using the ConfigMaps
 echo 'Configure the deployment configurations using the ConfigMaps'
 oc set env dc/nationalparks --from=configmap/nationalparks-config
-#oc set env dc/nationalparks --from=configmap/mongodb-configmap
+oc set env dc/nationalparks --from=configmap/mongodb-configmap
 oc set env dc/mlbparks --from=configmap/mlbparks-config
-#oc set env dc/mlbparks --from=configmap/mongodb-configmap
+oc set env dc/mlbparks --from=configmap/mongodb-configmap
 oc set env dc/parksmap --from=configmap/parksmap-config
 
 
