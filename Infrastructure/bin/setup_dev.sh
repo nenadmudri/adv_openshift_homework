@@ -191,11 +191,20 @@ oc set deployment-hook dc/parksmap  -n ${GUID}-parks-dev --post -c parksmap --fa
 #oc rollout latest dc/mlbparks -n $GUID-parks-dev
 #oc rollout latest dc/parksmap -n $GUID-parks-dev
 #oc rollout latest dc/nationalparks -n $GUID-parks-dev
-oc rollout resume dc/mlbparks
-oc rollout resume dc/nationalparks
-oc rollout resume dc/parksmap
 
+echo '********************************************************'
+echo 'Dev deployment resumed'
+echo '********************************************************'
 
+oc rollout resume dc/mlbparks  -n $GUID-parks-dev
+oc rollout resume dc/nationalparks  -n $GUID-parks-dev
+oc rollout resume dc/parksmap  -n $GUID-parks-dev
+sleep 300
+echo '********************************************************'
+echo 'Dev deployment terminated'
+echo '********************************************************'
+
+sleep 300
 
 
 echo "Finished setting up dev"
