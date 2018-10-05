@@ -248,18 +248,17 @@ oc set probe dc/g-parksmap --liveness      --initial-delay-seconds 30 --failure-
 
 
 oc set env dc/b-nationalparks --from=configmap/b-nationalparks-config
-oc set env dc/b-nationalparks --from=configmap/mongodb-prod-configmap
+oc set env dc/b-nationalparks --from=configmap/park-prd-conf
 
 oc set env dc/g-nationalparks --from=configmap/g-nationalparks-config
-oc set env dc/g-nationalparks --from=configmap/mongodb-prod-configmap
+oc set env dc/g-nationalparks --from=configmap/park-prd-conf
 
 #oc create configmap mlbparks-config     --from-literal=APPNAME="MLB Parks (Dev)"
 oc set env dc/b-mlbparks --from=configmap/b-mlbparks-config
-oc set env dc/b-mlbparks --from=configmap/mongodb-prod-configmap
+oc set env dc/b-mlbparks --from=configmap/park-prd-conf
 
 oc set env dc/g-mlbparks --from=configmap/g-mlbparks-config
-oc set env dc/g-mlbparks --from=configmap/mongodb-prod-configmap
-
+oc set env dc/g-mlbparks --from=configmap/park-prd-conf
 
 #oc create configmap parksmap-config     --from-literal=APPNAME="ParksMap (Dev)"
 
