@@ -126,10 +126,9 @@ oc policy add-role-to-user view --serviceaccount=default
 oc new-app ${GUID}-parks-dev/mlbparks:0.0-0 --name=mlbparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
 oc new-app ${GUID}-parks-dev/nationalparks:0.0-0 --name=nationalparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
 oc new-app ${GUID}-parks-dev/parksmap:0.0-0 --name=parksmap --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
-
-oc rollout pause dc/mlbparks
-oc rollout pause dc/nationalparks
-oc rollout pause dc/parksmap
+#oc rollout pause dc/mlbparks
+#oc rollout pause dc/nationalparks
+#oc rollout pause dc/parksmap
 
 
 echo 'Set triggers - remove'
@@ -177,9 +176,9 @@ oc set env dc/parksmap --from=configmap/parksmap-config
 
 echo 'oc patch dc and deployment hooks'
 
-oc patch dc/parksmap --patch "spec: { strategy: {type: Rolling, rollingParams: {post: {failurePolicy: Ignore, execNewPod: {containerName: parksmap, command: ['curl -XGET http://localhost:8080/ws/data/load/']}}, timeoutSeconds: 6000}}}"
-oc patch dc/mlbparks --patch "spec: { strategy: {type: Rolling, rollingParams: {post: {failurePolicy: Ignore, execNewPod: {containerName: mlbparks, command: ['curl -XGET http://localhost:8080/ws/data/load/']}}, timeoutSeconds: 6000}}}"
-oc patch dc/nationalparks --patch "spec: { strategy: {type: Rolling, rollingParams: {post: {failurePolicy: Ignore, execNewPod: {containerName: nationalparks, command: ['curl -XGET http://localhost:8080/ws/data/load/']}}, timeoutSeconds: 6000}}}"
+#oc patch dc/parksmap --patch "spec: { strategy: {type: Rolling, rollingParams: {post: {failurePolicy: Ignore, execNewPod: {containerName: parksmap, command: ['curl -XGET http://localhost:8080/ws/data/load/']}}, timeoutSeconds: 6000}}}"
+#oc patch dc/mlbparks --patch "spec: { strategy: {type: Rolling, rollingParams: {post: {failurePolicy: Ignore, execNewPod: {containerName: mlbparks, command: ['curl -XGET http://localhost:8080/ws/data/load/']}}, timeoutSeconds: 6000}}}"
+#oc patch dc/nationalparks --patch "spec: { strategy: {type: Rolling, rollingParams: {post: {failurePolicy: Ignore, execNewPod: {containerName: nationalparks, command: ['curl -XGET http://localhost:8080/ws/data/load/']}}, timeoutSeconds: 6000}}}"
 ##### Set deploymenth  hooks
     
 
@@ -192,19 +191,19 @@ oc set deployment-hook dc/parksmap  -n ${GUID}-parks-dev --post -c parksmap --fa
 #oc rollout latest dc/parksmap -n $GUID-parks-dev
 #oc rollout latest dc/nationalparks -n $GUID-parks-dev
 
-echo '********************************************************'
-echo 'Dev deployment resumed'
-echo '********************************************************'
+#echo '********************************************************'
+#echo 'Dev deployment resumed'
+#echo '********************************************************'
 
-oc rollout resume dc/mlbparks  -n $GUID-parks-dev
-oc rollout resume dc/nationalparks  -n $GUID-parks-dev
-oc rollout resume dc/parksmap  -n $GUID-parks-dev
-sleep 300
+#oc rollout resume dc/mlbparks  -n $GUID-parks-dev
+#oc rollout resume dc/nationalparks  -n $GUID-parks-dev
+#oc rollout resume dc/parksmap  -n $GUID-parks-dev
+#sleep 300
 echo '********************************************************'
 echo 'Dev deployment terminated'
 echo '********************************************************'
 
-sleep 300
+#sleep 300
 
 
 echo "Finished setting up dev"
