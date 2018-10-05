@@ -120,11 +120,12 @@ oc policy add-role-to-user view --serviceaccount=default
 
 #create app
 oc new-app ${GUID}-parks-dev/mlbparks:0.0-0 --name=mlbparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
-
 oc new-app ${GUID}-parks-dev/nationalparks:0.0-0 --name=nationalparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
-
 oc new-app ${GUID}-parks-dev/parksmap:0.0-0 --name=parksmap --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
 
+oc rollout pause dc/mlbparks
+oc rollout pause dc/nationalparks
+oc rollout pause dc/parksmap
 
 
 echo 'Set triggers - remove'
