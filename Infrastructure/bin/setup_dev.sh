@@ -184,18 +184,14 @@ oc set deployment-hook dc/mlbparks  -n ${GUID}-parks-dev --post -c mlbparks --fa
 oc set deployment-hook dc/parksmap  -n ${GUID}-parks-dev --post -c parksmap --failure-policy=abort -- curl http://$(oc get route parksmap -n ${GUID}-parks-dev -o jsonpath='{ .spec.host }')/ws/data/load/
 
 sleep 300
+#oc rollout latest dc/mlbparks -n $GUID-parks-dev
+#oc rollout latest dc/parksmap -n $GUID-parks-dev
+#oc rollout latest dc/nationalparks -n $GUID-parks-dev
+oc rollout resume dc/mlbparks
+oc rollout resume dc/nationalparks
+oc rollout resume dc/parksmap
 
-oc rollout latest dc/nationalparks -n $GUID-parks-dev
 
-sleep 120
-
-oc rollout latest dc/mlbparks -n $GUID-parks-dev
-
-sleep 120
-
-oc rollout latest dc/parksmap -n $GUID-parks-dev
-
-sleep 120
 
 
 echo "Finished setting up dev"
