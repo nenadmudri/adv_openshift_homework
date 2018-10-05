@@ -89,7 +89,7 @@ oc new-build --binary=true  --name=mlbparks jboss-eap70-openshift:1.7 -n ${GUID}
 oc new-build --binary=true  --name=nationalparks redhat-openjdk18-openshift:1.2 -n ${GUID}-parks-dev
 oc new-build --binary=true  --name=parksmap redhat-openjdk18-openshift:1.2 -n ${GUID}-parks-dev
 
-#-t configmap --configmap-name=gogs
+
 oc policy add-role-to-user view --serviceaccount=default
 
 
@@ -133,14 +133,14 @@ while : ; do
         break 
     fi
 done
-
+echo 'Set triggers - remove'
 oc set triggers dc/mlbparks --remove-all
 oc set triggers dc/nationalparks --remove-all
 oc set triggers dc/parksmap --remove-all
 
 
 ####       Expose and label the services properly (parksmap-backend)
-
+echo   'Expose and label the services properly (parksmap-backend)'
 oc expose dc mlbparks --port 8080
 oc expose dc nationalparks --port 8080
 oc expose dc parksmap --port 8080
@@ -151,7 +151,7 @@ oc expose svc parksmap  -l type=parksmap-backend
 
 
 ######     Set up liveness and readiness probes
-
+echo 'Set up liveness and readiness probes'
 oc set probe dc/mlbparks --readiness     --initial-delay-seconds 30 --failure-threshold 3   --get-url=http://:8080/ws/healthz/
 oc set probe dc/mlbparks --liveness      --initial-delay-seconds 30 --failure-threshold 3     --get-url=http://:8080/ws/healthz/
 
@@ -167,23 +167,16 @@ oc set probe dc/parksmap --liveness      --initial-delay-seconds 30 --failure-th
 #oc create configmap mlbparks-config --from-literal="application-db.properties=Placeholder"
 #oc create configmap nationalparks-config --from-literal="application-db.properties=Placeholder"
 
-
-#oc create configmap nationalparks-config     --from-literal=APPNAME="National Parks (Dev)"
 ######   Configure the deployment configurations using the ConfigMaps
-
+echo 'Configure the deployment configurations using the ConfigMaps'
 oc set env dc/nationalparks --from=configmap/nationalparks-config
-oc set env dc/nationalparks --from=configmap/mongodb-configmap
-
-#oc create configmap mlbparks-config     --from-literal=APPNAME="MLB Parks (Dev)"
+#oc set env dc/nationalparks --from=configmap/mongodb-configmap
 oc set env dc/mlbparks --from=configmap/mlbparks-config
-oc set env dc/mlbparks --from=configmap/mongodb-configmap
-#oc create configmap parksmap-config     --from-literal=APPNAME="ParksMap (Dev)"
-
-
+#oc set env dc/mlbparks --from=configmap/mongodb-configmap
 oc set env dc/parksmap --from=configmap/parksmap-config
 
 
-
+echo 'oc patch dc'
 
 oc patch dc/mlbparks --patch "spec: { strategy: {type: Rolling, rollingParams: {post: {failurePolicy: Ignore, execNewPod: {containerName: mlbparks, command: ['curl -XGET http://localhost:8080/ws/data/load/']}}}}}"
 oc patch dc/nationalparks --patch "spec: { strategy: {type: Rolling, rollingParams: {post: {failurePolicy: Ignore, execNewPod: {containerName: nationalparks, command: ['curl -XGET http://localhost:8080/ws/data/load/']}}}}}"
