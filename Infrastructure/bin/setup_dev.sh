@@ -40,6 +40,10 @@ echo "Setting up Parks Development Environment in project ${GUID}-parks-dev"
 
 ######   Create ConfigMaps for configuration of the applications
 oc project $GUID-parks-dev 
+oc policy add-role-to-user view --serviceaccount=default -n $GUID-parks-dev
+oc policy add-role-to-user edit system:serviceaccount:$GUID-jenkins:jenkins -n $GUID-parks-dev
+oc policy add-role-to-user admin system:serviceaccount:gpte-jenkins:jenkins -n $GUID-parks-dev
+
 
 oc create configmap mongodb-configmap        --from-literal=DB_HOST=mongodb    --from-literal=DB_PORT=27017   --from-literal=DB_USERNAME=mongodb     --from-literal=DB_PASSWORD=mongodb   --from-literal=DB_NAME=parks   --from-literal=DB_REPLICASET=rs0
 
