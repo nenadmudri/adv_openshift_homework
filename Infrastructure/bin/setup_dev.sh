@@ -122,6 +122,18 @@ oc new-app ${GUID}-parks-dev/nationalparks:0.0-0 --name=nationalparks --allow-mi
 
 oc new-app ${GUID}-parks-dev/parksmap:0.0-0 --name=parksmap --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
 
+while : ; do
+    oc get pod -n ${GUID}-parks-dev | grep -v deploy | grep "1/1"
+    echo "Checking if MongoDB is Ready..."
+    if [ $? == "1" ] 
+      then 
+      echo "Wait 10 seconds..."
+        sleep 10
+      else 
+        break 
+    fi
+done
+
 oc set triggers dc/mlbparks --remove-all
 oc set triggers dc/nationalparks --remove-all
 oc set triggers dc/parksmap --remove-all
