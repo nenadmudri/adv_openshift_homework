@@ -7,10 +7,8 @@ if [ "$#" -ne 1 ]; then
 fi
 #echo "Skipping production for now"
 #exit
-sleep 120
-echo '....sleep 360'
-sleep 120
-sleep 120
+sleep 1000
+echo '....sleep 1000'
 
 GUID=$1
 echo "Setting up Parks Production Environment in project ${GUID}-parks-prod"
@@ -327,6 +325,9 @@ echo '**************************************************************************
 echo '*********************************************************************************'
 echo 'Rollout started'
 echo '*********************************************************************************'
+
+sleep 1000
+echo '....sleep 1000'
 
 
 oc set deployment-hook dc/g-nationalparks --post     -- curl -s http://nationalparks:8080/ws/data/load/
