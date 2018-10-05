@@ -6,9 +6,9 @@ if [ "$#" -ne 1 ]; then
     exit 1
 fi
 
-oc rollout resume dc/mlbparks
-oc rollout resume dc/nationalparks
-oc rollout resume dc/parksmap
+#oc rollout resume dc/mlbparks
+#oc rollout resume dc/nationalparks
+#oc rollout resume dc/parksmap
 
 
 
