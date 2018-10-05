@@ -171,7 +171,7 @@ oc set env dc/mlbparks --from=configmap/mongodb-configmap
 oc set env dc/parksmap --from=configmap/parksmap-config
 
 
-echo 'oc patch dc and deplozment hooks'
+echo 'oc patch dc and deployment hooks'
 
 oc patch dc/parksmap --patch "spec: { strategy: {type: Rolling, rollingParams: {post: {failurePolicy: Ignore, execNewPod: {containerName: parksmap, command: ['curl -XGET http://localhost:8080/ws/data/load/']}}, timeoutSeconds: 6000}}}"
 oc patch dc/mlbparks --patch "spec: { strategy: {type: Rolling, rollingParams: {post: {failurePolicy: Ignore, execNewPod: {containerName: mlbparks, command: ['curl -XGET http://localhost:8080/ws/data/load/']}}, timeoutSeconds: 6000}}}"
