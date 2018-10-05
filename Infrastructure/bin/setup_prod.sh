@@ -7,8 +7,8 @@ if [ "$#" -ne 1 ]; then
 fi
 #echo "Skipping production for now"
 #exit
-sleep 1000
-echo '....sleep 1000'
+#sleep 1000
+#echo '....sleep 1000'
 
 GUID=$1
 echo "Setting up Parks Production Environment in project ${GUID}-parks-prod"
@@ -351,22 +351,22 @@ oc set deployment-hook dc/g-nationalparks  -n ${GUID}-parks-dev --post -c nation
 oc set deployment-hook dc/g-mlbparks  -n ${GUID}-parks-dev --post -c mlbparks --failure-policy=abort -- curl http://$(oc get route mlbparks -n ${GUID}-parks-dev -o jsonpath='{ .spec.host }')/ws/data/load/
 oc set deployment-hook dc/g-parksmap  -n ${GUID}-parks-dev --post -c parksmap --failure-policy=abort -- curl http://$(oc get route parksmap -n ${GUID}-parks-dev -o jsonpath='{ .spec.host }')/ws/data/load/
 
-sleep 1000
+#sleep 1000
 
 oc rollout resume dc/b-nationalparks -n $GUID-parks-dev
 oc rollout resume dc/g-nationalparks -n $GUID-parks-dev
 
-sleep 1000
+#sleep 1000
 
 oc rollout resume dc/b-mlbparks -n $GUID-parks-dev
 oc rollout resume dc/g-mlbparks -n $GUID-parks-dev
 
-sleep 1000
+#sleep 1000
 
 oc rollout resume dc/b-parksmap -n $GUID-parks-dev
 oc rollout resume dc/g-parksmap -n $GUID-parks-dev
 
-sleep 1000
+#sleep 1000
 
 
 echo '*********************************************************************************'
