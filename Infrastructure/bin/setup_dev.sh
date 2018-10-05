@@ -125,17 +125,8 @@ oc new-app ${GUID}-parks-dev/nationalparks:0.0-0 --name=nationalparks --allow-mi
 
 oc new-app ${GUID}-parks-dev/parksmap:0.0-0 --name=parksmap --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
 
-while : ; do
-    oc get pod -n ${GUID}-parks-dev | grep -v deploy | grep "1/1"
-    echo "Checking if MongoDB is Ready..."
-    if [ $? == "1" ] 
-      then 
-      echo "Wait 10 seconds..."
-        sleep 10
-      else 
-        break 
-    fi
-done
+
+
 echo 'Set triggers - remove'
 oc set triggers dc/mlbparks --remove-all
 oc set triggers dc/nationalparks --remove-all
@@ -179,18 +170,30 @@ oc set env dc/mlbparks --from=configmap/mongodb-configmap
 oc set env dc/parksmap --from=configmap/parksmap-config
 
 
-echo 'oc patch dc'
+echo 'oc patch dc and deplozment hooks'
 
 oc patch dc/mlbparks --patch "spec: { strategy: {type: Rolling, rollingParams: {post: {failurePolicy: Ignore, execNewPod: {containerName: mlbparks, command: ['curl -XGET http://localhost:8080/ws/data/load/']}}}}}"
 oc patch dc/nationalparks --patch "spec: { strategy: {type: Rolling, rollingParams: {post: {failurePolicy: Ignore, execNewPod: {containerName: nationalparks, command: ['curl -XGET http://localhost:8080/ws/data/load/']}}}}}"
 ##### Set deploymenth  hooks
     
-oc set deployment-hook dc/nationalparks --post     -- curl -s http://nationalparks:8080/ws/data/load/
+
+oc set deployment-hook dc/nationalparks  -n ${GUID}-parks-dev --post -c nationalparks --failure-policy=abort -- curl http://$(oc get route nationalparks -n ${GUID}-parks-dev -o jsonpath='{ .spec.host }')/ws/data/load/
+oc set deployment-hook dc/mlbparks  -n ${GUID}-parks-dev --post -c mlbparks --failure-policy=abort -- curl http://$(oc get route mlbparks -n ${GUID}-parks-dev -o jsonpath='{ .spec.host }')/ws/data/load/
+oc set deployment-hook dc/parksmap  -n ${GUID}-parks-dev --post -c parksmap --failure-policy=abort -- curl http://$(oc get route parksmap -n ${GUID}-parks-dev -o jsonpath='{ .spec.host }')/ws/data/load/
+
+sleep 300
 
 oc rollout latest dc/nationalparks -n $GUID-parks-dev
 
-oc set deployment-hook dc/mlbparks --post     -- curl -s http://mlbparks:8080/ws/data/load/
+sleep 120
 
 oc rollout latest dc/mlbparks -n $GUID-parks-dev
+
+sleep 120
+
+oc rollout latest dc/parksmap -n $GUID-parks-dev
+
+sleep 120
+
 
 echo "Finished setting up dev"
