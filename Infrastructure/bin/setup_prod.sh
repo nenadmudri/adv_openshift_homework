@@ -61,7 +61,9 @@ oc create configmap g-mlbparks-config     --from-literal=APPNAME="MLB Parks (Gre
 
 oc create configmap g-parksmap-config     --from-literal=APPNAME="ParksMap (Green)"
 
-
+echo '*********************************************************************************'
+echo 'Config map created'
+echo '*********************************************************************************'
 #sudo docker pull registry.access.redhat.com/openshift3/mongodb-24-rhel7
 #sudo docker pull registry.access.redhat.com/rhscl/mongodb-26-rhel7
 #oc new-app --name=mongodb  -e MONGODB_USER=mongodb MONGODB_PASSWORD=mongodb MONGODB_DATABASE=mongodb MONGODB_ADMIN_PASSWORD=mongodb registry.access.redhat.com/rhscl/mongodb-26-rhel7
@@ -142,6 +144,12 @@ oc new-build --binary=true --strategy=source --name=g-nationalparks redhat-openj
 oc new-build --binary=true --strategy=source --name=g-parksmap redhat-openjdk18-openshift:1.2
 
 
+
+echo '*********************************************************************************'
+echo 'Build created'
+echo '*********************************************************************************'
+
+
 #-t configmap --configmap-name=gogs
 oc policy add-role-to-user view --serviceaccount=default
 
@@ -176,6 +184,10 @@ oc new-app ${GUID}-parks-dev/nationalparks:0.0 --name=g-nationalparks --allow-mi
 oc new-app ${GUID}-parks-dev/parksmap:0.0 --name=g-parksmap --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
 
 
+echo '*********************************************************************************'
+echo 'Apps created'
+echo '*********************************************************************************'
+
 
 #oc new-app $GUID-parks-dev/mlbparks:0.0-0 -t configmap --configmap-name=mlbparks-config --name=mlbparks --allow-missing-imagestream-tags=true
 #oc new-app $GUID-parks-dev/nationalparks:0.0-0 -t configmap --configmap-name=nationalparks-config --name=nationalparks --allow-missing-imagestream-tags=true
@@ -203,6 +215,10 @@ oc set triggers dc/g-parksmap --remove-all
 oc set triggers dc/g-parksmap --remove-all
 
 
+echo '*********************************************************************************'
+echo 'Triggers created'
+echo '*********************************************************************************'
+
 oc expose dc b-mlbparks --port 8080
 oc expose dc b-nationalparks --port 8080
 oc expose dc b-parksmap --port 8080
@@ -219,6 +235,10 @@ oc expose svc g-mlbparks -l type=parksmap-backend
 oc expose svc g-nationalparks  -l type=parksmap-backend
 oc expose svc g-parksmap  -l type=parksmap-backend
 
+
+echo '*********************************************************************************'
+echo 'Expose created'
+echo '*********************************************************************************'
 
 oc set probe dc/b-mlbparks --readiness     --initial-delay-seconds 30 --failure-threshold 3   --get-url=http://:8080/ws/healthz/
 oc set probe dc/b-mlbparks --liveness      --initial-delay-seconds 30 --failure-threshold 3     --get-url=http://:8080/ws/healthz/
@@ -239,6 +259,12 @@ oc set probe dc/g-nationalparks --liveness      --initial-delay-seconds 30 --fai
 
 oc set probe dc/g-parksmap --readiness     --initial-delay-seconds 30 --failure-threshold 3   --get-url=http://:8080/ws/healthz/
 oc set probe dc/g-parksmap --liveness      --initial-delay-seconds 30 --failure-threshold 3     --get-url=http://:8080/ws/healthz/
+
+
+
+echo '*********************************************************************************'
+echo 'Probe created'
+echo '*********************************************************************************'
 
 #oc create configmap mlbparks-config --from-literal="application-db.properties=Placeholder"
 #oc create configmap nationalparks-config --from-literal="application-db.properties=Placeholder"
@@ -269,6 +295,11 @@ oc set env dc/b-parksmap --from=configmap/b-parksmap-config
 oc set env dc/g-parksmap --from=configmap/g-parksmap-config
 
 
+echo '*********************************************************************************'
+echo 'confi map env created'
+echo '*********************************************************************************'
+
+
 oc patch dc/b-mlbparks --patch "spec: { strategy: {type: Rolling, rollingParams: {post: {failurePolicy: Ignore, execNewPod: {containerName: mlbparks, command: ['curl -XGET ht
 tp://localhost:8080/ws/data/load/']}}}}}"
 oc patch dc/b-nationalparks --patch "spec: { strategy: {type: Rolling, rollingParams: {post: {failurePolicy: Ignore, execNewPod: {containerName: nationalparks, command: ['cur
@@ -279,6 +310,11 @@ oc patch dc/g-nationalparks --patch "spec: { strategy: {type: Rolling, rollingPa
 l -XGET http://localhost:8080/ws/data/load/']}}}}}"
 
 
+echo '*********************************************************************************'
+echo 'Patch created'
+echo '*********************************************************************************'
+
+
 #oc set deployment-hook dc/b-nationalparks --post     -- curl -s http://nationalparks:8080/ws/data/load/
 
 #oc rollout latest dc/b-nationalparks -n 0254-parks-prod
@@ -287,9 +323,19 @@ l -XGET http://localhost:8080/ws/data/load/']}}}}}"
 
 #oc rollout latest dc/b-mlbparks -n 0254-parks-prod
 
+
+echo '*********************************************************************************'
+echo 'Rollout started'
+echo '*********************************************************************************'
+
+
 oc set deployment-hook dc/g-nationalparks --post     -- curl -s http://nationalparks:8080/ws/data/load/
 oc rollout latest dc/g-nationalparks -n $GUID-parks-prod
 
 oc set deployment-hook dc/g-mlbparks --post     -- curl -s http://mlbparks:8080/ws/data/load/
 oc rollout latest dc/g-mlbparks -n $GUID-parks-prod
 
+
+echo '*********************************************************************************'
+echo 'Rollout terminated'
+echo '*********************************************************************************'
