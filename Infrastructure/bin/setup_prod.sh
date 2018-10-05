@@ -326,15 +326,34 @@ echo '**************************************************************************
 echo 'Rollout started'
 echo '*********************************************************************************'
 
+#sleep 1000
+#echo '....sleep 1000'
+
+
+#oc set deployment-hook dc/g-nationalparks --post     -- curl -s http://nationalparks:8080/ws/data/load/
+#oc rollout latest dc/g-nationalparks -n $GUID-parks-prod
+
+#oc set deployment-hook dc/g-mlbparks --post     -- curl -s http://mlbparks:8080/ws/data/load/
+#oc rollout latest dc/g-mlbparks -n $GUID-parks-prod
+
+
+oc set deployment-hook dc/g-nationalparks  -n ${GUID}-parks-dev --post -c nationalparks --failure-policy=abort -- curl http://$(oc get route nationalparks -n ${GUID}-parks-dev -o jsonpath='{ .spec.host }')/ws/data/load/
+oc set deployment-hook dc/g-mlbparks  -n ${GUID}-parks-dev --post -c mlbparks --failure-policy=abort -- curl http://$(oc get route mlbparks -n ${GUID}-parks-dev -o jsonpath='{ .spec.host }')/ws/data/load/
+oc set deployment-hook dc/g-parksmap  -n ${GUID}-parks-dev --post -c parksmap --failure-policy=abort -- curl http://$(oc get route parksmap -n ${GUID}-parks-dev -o jsonpath='{ .spec.host }')/ws/data/load/
+
 sleep 1000
-echo '....sleep 1000'
 
+oc rollout latest dc/g-nationalparks -n $GUID-parks-dev
 
-oc set deployment-hook dc/g-nationalparks --post     -- curl -s http://nationalparks:8080/ws/data/load/
-oc rollout latest dc/g-nationalparks -n $GUID-parks-prod
+sleep 1000
 
-oc set deployment-hook dc/g-mlbparks --post     -- curl -s http://mlbparks:8080/ws/data/load/
-oc rollout latest dc/g-mlbparks -n $GUID-parks-prod
+oc rollout latest dc/g-mlbparks -n $GUID-parks-dev
+
+sleep 1000
+
+oc rollout latest dc/g-parksmap -n $GUID-parks-dev
+
+sleep 1000
 
 
 echo '*********************************************************************************'
