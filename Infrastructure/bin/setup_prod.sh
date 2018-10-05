@@ -7,8 +7,8 @@ if [ "$#" -ne 1 ]; then
 fi
 #echo "Skipping production for now"
 #exit
-sleep 100
-echo '....sleep 100'
+#sleep 1000
+#echo '....sleep 1000'
 
 GUID=$1
 echo "Setting up Parks Production Environment in project ${GUID}-parks-prod"
@@ -181,12 +181,12 @@ oc new-app ${GUID}-parks-dev/mlbparks:0.0 --name=g-mlbparks --allow-missing-imag
 oc new-app ${GUID}-parks-dev/nationalparks:0.0 --name=g-nationalparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
 oc new-app ${GUID}-parks-dev/parksmap:0.0 --name=g-parksmap --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
 
-oc rollout pause dc/b-mlbparks
-oc rollout pause dc/b-nationalparks
-oc rollout pause dc/b-parksmap
-oc rollout pause dc/g-mlbparks
-oc rollout pause dc/g-nationalparks
-oc rollout pause dc/g-parksmap
+#oc rollout pause dc/b-mlbparks
+#oc rollout pause dc/b-nationalparks
+#oc rollout pause dc/b-parksmap
+#oc rollout pause dc/g-mlbparks
+#oc rollout pause dc/g-nationalparks
+#oc rollout pause dc/g-parksmap
 
 
 echo '*********************************************************************************'
@@ -353,18 +353,18 @@ oc set deployment-hook dc/g-parksmap  -n ${GUID}-parks-dev --post -c parksmap --
 
 #sleep 1000
 
-oc rollout resume dc/b-nationalparks -n $GUID-parks-dev
-oc rollout resume dc/g-nationalparks -n $GUID-parks-dev
+#oc rollout resume dc/b-nationalparks -n $GUID-parks-dev
+#oc rollout resume dc/g-nationalparks -n $GUID-parks-dev
 
 #sleep 1000
 
-oc rollout resume dc/b-mlbparks -n $GUID-parks-dev
-oc rollout resume dc/g-mlbparks -n $GUID-parks-dev
+#oc rollout resume dc/b-mlbparks -n $GUID-parks-dev
+#oc rollout resume dc/g-mlbparks -n $GUID-parks-dev
 
 #sleep 1000
 
-oc rollout resume dc/b-parksmap -n $GUID-parks-dev
-oc rollout resume dc/g-parksmap -n $GUID-parks-dev
+#oc rollout resume dc/b-parksmap -n $GUID-parks-dev
+#oc rollout resume dc/g-parksmap -n $GUID-parks-dev
 
 #sleep 1000
 
