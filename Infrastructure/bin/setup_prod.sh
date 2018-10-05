@@ -102,7 +102,7 @@ spec:
     
     
 
-oc set env dc/mongodb --from=configmap/park-prd-conf
+oc set env dc/mongodb-p --from=configmap/park-prd-conf
 echo "apiVersion: "v1"
 kind: "PersistentVolumeClaim"
 metadata:
@@ -115,8 +115,8 @@ spec:
       storage: "2Gi"" | oc create -f -
 
 
-oc set volume dc/mongodb --add --type=persistentVolumeClaim --name=mongo-pv --claim-name=mongo-pvc-prod --mount-path=/data --containers=*
-oc rollout resume dc/mongodb
+oc set volume dc/mongodb-p --add --type=persistentVolumeClaim --name=mongo-pv --claim-name=mongo-pvc-prod --mount-path=/data --containers=*
+oc rollout resume dc/mongodb-p
 
 while : ; do
     oc get pod -n ${GUID}-parks-prod | grep -v deploy | grep "1/1"
