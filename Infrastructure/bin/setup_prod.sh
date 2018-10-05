@@ -11,7 +11,7 @@ sleep 120
 echo '....sleep 360'
 sleep 120
 sleep 120
-exit
+
 GUID=$1
 echo "Setting up Parks Production Environment in project ${GUID}-parks-prod"
 
