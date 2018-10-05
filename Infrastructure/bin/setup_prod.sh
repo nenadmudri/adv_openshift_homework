@@ -203,9 +203,9 @@ oc set triggers dc/g-parksmap --remove-all
 oc set triggers dc/g-parksmap --remove-all
 
 
-#oc expose dc b-mlbparks --port 8080
-#oc expose dc b-nationalparks --port 8080
-#oc expose dc b-parksmap --port 8080
+oc expose dc b-mlbparks --port 8080
+oc expose dc b-nationalparks --port 8080
+oc expose dc b-parksmap --port 8080
 oc expose dc g-mlbparks --port 8080
 oc expose dc g-nationalparks --port 8080
 oc expose dc g-parksmap --port 8080
