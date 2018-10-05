@@ -181,6 +181,13 @@ oc new-app ${GUID}-parks-dev/mlbparks:0.0 --name=g-mlbparks --allow-missing-imag
 oc new-app ${GUID}-parks-dev/nationalparks:0.0 --name=g-nationalparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
 oc new-app ${GUID}-parks-dev/parksmap:0.0 --name=g-parksmap --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
 
+oc rollout pause dc/b-mlbparks
+oc rollout pause dc/b-nationalparks
+oc rollout pause dc/b-parksmap
+oc rollout pause dc/g-mlbparks
+oc rollout pause dc/g-nationalparks
+oc rollout pause dc/g-parksmap
+
 
 echo '*********************************************************************************'
 echo 'Apps created'
@@ -299,13 +306,17 @@ echo '**************************************************************************
 
 
 oc patch dc/b-mlbparks --patch "spec: { strategy: {type: Rolling, rollingParams: {post: {failurePolicy: Ignore, execNewPod: {containerName: mlbparks, command: ['curl -XGET ht
-tp://localhost:8080/ws/data/load/']}}}}}"
+tp://localhost:8080/ws/data/load/']}}, timeoutSeconds: 6000}}}"
 oc patch dc/b-nationalparks --patch "spec: { strategy: {type: Rolling, rollingParams: {post: {failurePolicy: Ignore, execNewPod: {containerName: nationalparks, command: ['cur
-l -XGET http://localhost:8080/ws/data/load/']}}}}}"
+l -XGET http://localhost:8080/ws/data/load/']}}, timeoutSeconds: 6000}}}"
+oc patch dc/b-parksmap --patch "spec: { strategy: {type: Rolling, rollingParams: {post: {failurePolicy: Ignore, execNewPod: {containerName: parksmap, command: ['cur
+l -XGET http://localhost:8080/ws/data/load/']}}, timeoutSeconds: 6000}}}"
 oc patch dc/g-mlbparks --patch "spec: { strategy: {type: Rolling, rollingParams: {post: {failurePolicy: Ignore, execNewPod: {containerName: mlbparks, command: ['curl -XGET ht
-tp://localhost:8080/ws/data/load/']}}}}}"
+tp://localhost:8080/ws/data/load/']}}, timeoutSeconds: 6000}}}"
 oc patch dc/g-nationalparks --patch "spec: { strategy: {type: Rolling, rollingParams: {post: {failurePolicy: Ignore, execNewPod: {containerName: nationalparks, command: ['cur
-l -XGET http://localhost:8080/ws/data/load/']}}}}}"
+l -XGET http://localhost:8080/ws/data/load/']}}, timeoutSeconds: 6000}}}"
+oc patch dc/g-parksmap --patch "spec: { strategy: {type: Rolling, rollingParams: {post: {failurePolicy: Ignore, execNewPod: {containerName: parksmap, command: ['cur
+l -XGET http://localhost:8080/ws/data/load/']}}, timeoutSeconds: 6000}}}"
 
 
 echo '*********************************************************************************'
@@ -336,21 +347,23 @@ echo '**************************************************************************
 #oc set deployment-hook dc/g-mlbparks --post     -- curl -s http://mlbparks:8080/ws/data/load/
 #oc rollout latest dc/g-mlbparks -n $GUID-parks-prod
 
-
 oc set deployment-hook dc/g-nationalparks  -n ${GUID}-parks-dev --post -c nationalparks --failure-policy=abort -- curl http://$(oc get route nationalparks -n ${GUID}-parks-dev -o jsonpath='{ .spec.host }')/ws/data/load/
 oc set deployment-hook dc/g-mlbparks  -n ${GUID}-parks-dev --post -c mlbparks --failure-policy=abort -- curl http://$(oc get route mlbparks -n ${GUID}-parks-dev -o jsonpath='{ .spec.host }')/ws/data/load/
 oc set deployment-hook dc/g-parksmap  -n ${GUID}-parks-dev --post -c parksmap --failure-policy=abort -- curl http://$(oc get route parksmap -n ${GUID}-parks-dev -o jsonpath='{ .spec.host }')/ws/data/load/
 
 sleep 1000
 
+oc rollout latest dc/b-nationalparks -n $GUID-parks-dev
 oc rollout latest dc/g-nationalparks -n $GUID-parks-dev
 
 sleep 1000
 
+oc rollout latest dc/b-mlbparks -n $GUID-parks-dev
 oc rollout latest dc/g-mlbparks -n $GUID-parks-dev
 
 sleep 1000
 
+oc rollout latest dc/b-parksmap -n $GUID-parks-dev
 oc rollout latest dc/g-parksmap -n $GUID-parks-dev
 
 sleep 1000
