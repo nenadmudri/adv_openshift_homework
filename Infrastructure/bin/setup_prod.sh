@@ -5,8 +5,8 @@ if [ "$#" -ne 1 ]; then
     echo "  $0 GUID"
     exit 1
 fi
-echo "Skipping production for now"
-exit
+#echo "Skipping production for now"
+#exit
 #sleep 1000
 #echo '....sleep 1000'
 
