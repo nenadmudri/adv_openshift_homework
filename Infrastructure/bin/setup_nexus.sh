@@ -46,7 +46,7 @@ while : ; do
     fi
 done
 oc get routes -n $GUID-nexus
-
+sleep 60
 echo 'When Nexus is running, populate Nexus with the correct repositories'
 
 curl -o setup_nexus3.sh -s https://raw.githubusercontent.com/wkulhanek/ocp_advanced_development_resources/master/nexus/setup_nexus3.sh
