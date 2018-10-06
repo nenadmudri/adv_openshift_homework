@@ -1,58 +1,290 @@
+
 #!/bin/bash
-# Setup Development Project
-if [ "$#" -ne 1 ]; then
-    echo "Usage:"
-    echo "  $0 GUID"
-    exit 1
-fi
+	# Setup Development Project
+	if [ "$#" -ne 1 ]; then
+	    echo "Usage:"
+	    echo "  $0 GUID"
+	    exit 1
+	fi
+	
 
-GUID=$1
-echo "Setting up Parks Development Environment in project ${GUID}-parks-dev"
+	#oc rollout resume dc/mlbparks
+	#oc rollout resume dc/nationalparks
+	#oc rollout resume dc/parksmap
+	
 
-# Code to set up the parks development project.
+	
 
-# To be Implemented by Student
-oc policy add-role-to-user view --serviceaccount=default -n $GUID-parks-dev
-oc policy add-role-to-user edit system:serviceaccount:$GUID-jenkins:jenkins -n $GUID-parks-dev
-oc policy add-role-to-user admin system:serviceaccount:gpte-jenkins:jenkins -n $GUID-parks-dev
+	
 
-oc new-app -e MONGODB_USER=mongodb -e MONGODB_PASSWORD=mongodb -e MONGODB_DATABASE=parks -e MONGODB_ADMIN_PASSWORD=mongodb --name=mongodb registry.access.redhat.com/rhscl/mongodb-34-rhel7:latest -n ${GUID}-parks-dev
+	GUID=$1
+	echo "Setting up Parks Development Environment in project ${GUID}-parks-dev"
+	
 
-oc new-build --binary=true --name="mlbparks" jboss-eap70-openshift:1.7 -n ${GUID}-parks-dev
-oc new-build --binary=true --name="nationalparks" redhat-openjdk18-openshift:1.2 -n ${GUID}-parks-dev
-oc new-build --binary=true --name="parksmap" redhat-openjdk18-openshift:1.2 -n ${GUID}-parks-dev
+	# Code to set up the parks development project.
+	
 
-oc create configmap mlbparks-config --from-env-file=./Infrastructure/templates/MLBParks-dev.env -n ${GUID}-parks-dev
-oc create configmap nationalparks-config --from-env-file=./Infrastructure/templates/NationalParks-dev.env -n ${GUID}-parks-dev
-oc create configmap parksmap-config --from-env-file=./Infrastructure/templates/ParksMap-dev.env -n ${GUID}-parks-dev
+	
 
-oc new-app ${GUID}-parks-dev/mlbparks:0.0-0 --name=mlbparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
-oc new-app ${GUID}-parks-dev/nationalparks:0.0-0 --name=nationalparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
-oc new-app ${GUID}-parks-dev/parksmap:0.0-0 --name=parksmap --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
+	
 
-oc set triggers dc/mlbparks --remove-all -n ${GUID}-parks-dev
-oc set triggers dc/nationalparks --remove-all -n ${GUID}-parks-dev
-oc set triggers dc/parksmap --remove-all -n ${GUID}-parks-dev
+	# Compile all projects
+	
 
-oc set env dc/mlbparks --from=configmap/mlbparks-config -n ${GUID}-parks-dev
-oc set env dc/nationalparks --from=configmap/nationalparks-config -n ${GUID}-parks-dev
-oc set env dc/parksmap --from=configmap/parksmap-config -n ${GUID}-parks-dev
+	#cd $HOME/advdev_homework_template/Nationalparks
+	#mvn -s ../nexus_settings.xml clean package -Dmaven.test.skip=true
+	
 
-oc expose dc mlbparks --port 8080 -n ${GUID}-parks-dev
-oc expose dc nationalparks --port 8080 -n ${GUID}-parks-dev
-oc expose dc parksmap --port 8080 -n ${GUID}-parks-dev
+	#cd $HOME/advdev_homework_template/MLBParks
+	#mvn -s ../nexus_settings.xml clean package -Dmaven.test.skip=true
+	
 
-oc expose svc mlbparks -n ${GUID}-parks-dev --labels="type=parksmap-backend"
-oc expose svc nationalparks -n ${GUID}-parks-dev --labels="type=parksmap-backend"
-oc expose svc parksmap -n ${GUID}-parks-dev
+	#cd $HOME/advdev_homework_template/ParksMap
+	#mvn -s ../nexus_settings.xml clean package spring-boot:repackage -DskipTests -Dcom.redhat.xpaas.repo.redhatga
+	
 
-oc set probe dc/mlbparks --liveness --failure-threshold 5 --initial-delay-seconds 30 -- echo ok -n ${GUID}-parks-dev
-oc set probe dc/mlbparks --readiness --failure-threshold 3 --initial-delay-seconds 60 --get-url=http://:8080/ws/healthz/ -n ${GUID}-parks-dev
-oc set probe dc/nationalparks --liveness --failure-threshold 5 --initial-delay-seconds 30 -- echo ok -n ${GUID}-parks-dev
-oc set probe dc/nationalparks --readiness --failure-threshold 3 --initial-delay-seconds 60 --get-url=http://:8080/ws/healthz/ -n ${GUID}-parks-dev
-oc set probe dc/parksmap --liveness --failure-threshold 5 --initial-delay-seconds 30 -- echo ok -n ${GUID}-parks-dev
-oc set probe dc/parksmap --readiness --failure-threshold 5 --initial-delay-seconds 60 --get-url=http://:8080/ws/healthz/ -n ${GUID}-parks-dev
+	
 
-oc set deployment-hook dc/mlbparks  -n ${GUID}-parks-dev --post -c mlbparks --failure-policy=abort -- curl http://$(oc get route mlbparks -n ${GUID}-parks-dev -o jsonpath='{ .spec.host }')/ws/data/load/
-oc set deployment-hook dc/nationalparks  -n ${GUID}-parks-dev --post -c nationalparks --failure-policy=abort -- curl http://$(oc get route nationalparks -n ${GUID}-parks-dev -o jsonpath='{ .spec.host }')/ws/data/load/
-oc set deployment-hook dc/parksmap  -n ${GUID}-parks-dev --post -c parksmap --failure-policy=abort -- curl http://$(oc get route parksmap -n ${GUID}-parks-dev -o jsonpath='{ .spec.host }')/ws/data/load/
+	######    Grant the correct permissions to the Jenkins service account
+	
+
+	#oc new-project $GUID-parks-dev --display-name "Shared Parks Dev"
+	#oc policy add-role-to-user admin ${USER} -n ${GUID}-parks-dev
+	
+
+	#oc annotate namespace ${GUID}-parks-dev openshift.io/requester=${USER} --overwrite
+	
+
+	######   Create ConfigMaps for configuration of the applications
+	oc project $GUID-parks-dev 
+	oc policy add-role-to-user view --serviceaccount=default -n $GUID-parks-dev
+	oc policy add-role-to-user edit system:serviceaccount:$GUID-jenkins:jenkins -n $GUID-parks-dev
+	oc policy add-role-to-user admin system:serviceaccount:gpte-jenkins:jenkins -n $GUID-parks-dev
+	
+
+	
+
+	oc create configmap mongodb-configmap        --from-literal=DB_HOST=mongodb    --from-literal=DB_PORT=27017   --from-literal=DB_USERNAME=mongodb     --from-literal=DB_PASSWORD=mongodb   --from-literal=DB_NAME=parks   --from-literal=DB_REPLICASET=rs0
+	
+
+	oc create configmap nationalparks-config     --from-literal=APPNAME="National Parks (Dev)"   
+	
+
+	oc create configmap mlbparks-config     --from-literal=APPNAME="MLB Parks (Dev)"
+	
+
+	oc create configmap parksmap-config     --from-literal=APPNAME="ParksMap (Dev)"
+	
+
+	
+
+	#####   Create a MongoDB database
+	#sudo docker pull registry.access.redhat.com/openshift3/mongodb-24-rhel7
+	#sudo docker pull registry.access.redhat.com/rhscl/mongodb-26-rhel7
+	#oc new-app --name=mongodb  -e MONGODB_USER=mongodb MONGODB_PASSWORD=mongodb MONGODB_DATABASE=mongodb MONGODB_ADMIN_PASSWORD=mongodb registry.access.redhat.com/rhscl/mongodb-26-rhel7
+	#oc new-app --name=mongodb -e MONGODB_USER=mongodb -e MONGODB_PASSWORD=mongodb -e MONGODB_DATABASE=parks -e MONGODB_ADMIN_PASSWORD=mongodb    registry.access.redhat.com/rhscl/mongodb-26-rhel7
+	#oc new-app mongodb-persistent --name=mongodb        
+	oc new-app -e MONGODB_USER=mongodb -e MONGODB_PASSWORD=mongodb -e MONGODB_DATABASE=parks -e MONGODB_ADMIN_PASSWORD=mongodb --name=mongodb registry.access.redhat.com/rhscl/mongodb-34-rhel7:latest -n ${GUID}-parks-dev
+	
+
+	oc rollout pause dc/mongodb
+	
+
+	
+
+	#oc set env dc/mongodb --from=configmap/mongodb-configmap
+	echo "apiVersion: "v1"
+	kind: "PersistentVolumeClaim"
+	metadata:
+	  name: "mongo-pvc"
+	spec:
+	  accessModes:
+	    - "ReadWriteOnce"
+	  resources:
+	    requests:
+	      storage: "2Gi"" | oc create -f -
+	
+
+	
+
+	oc set volume dc/mongodb --add --type=persistentVolumeClaim --name=mongo-pv --claim-name=mongo-pvc --mount-path=/data --containers=*
+	oc rollout resume dc/mongodb
+	
+
+	while : ; do
+	    oc get pod -n ${GUID}-parks-dev | grep -v deploy | grep "1/1"
+	    echo "Checking if MongoDB is Ready..."
+	    if [ $? == "1" ] 
+	      then 
+	      echo "Wait 10 seconds..."
+	        sleep 10
+	      else 
+	        break 
+	    fi
+	done
+	
+
+	
+
+	# Now build all parks apps
+	
+
+	oc new-build --binary=true  --name=mlbparks jboss-eap70-openshift:1.7 -n ${GUID}-parks-dev
+	oc new-build --binary=true  --name=nationalparks redhat-openjdk18-openshift:1.2 -n ${GUID}-parks-dev
+	oc new-build --binary=true  --name=parksmap redhat-openjdk18-openshift:1.2 -n ${GUID}-parks-dev
+	
+
+	
+
+	oc policy add-role-to-user view --serviceaccount=default
+	
+
+	
+
+	#oc start-build mlbparks --from-file=$HOME/advdev_homework_template/MLBParks/target/mlbparks.war --follow
+	#oc new-app $GUID-parks-dev/mlbparks:latest -e APPNAME="MLB Parks (Dev)" --name=mlbparks 
+	#oc new-app $GUID-parks-dev/mlbparks:0.0-0 -e APPNAME="MLB Parks (Dev)" --name=mlbparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
+	
+
+	
+
+	#oc start-build nationalparks --from-file=$HOME/advdev_homework_template/Nationalparks/target/nationalparks.jar --follow
+	#oc new-app $GUID-parks-dev/nationalparks:latest -e APPNAME="National Parks (Dev)" --name=nationalparks  
+	#oc new-app $GUID-parks-dev/nationalparks:0.0-0 -e APPNAME="National Parks (Dev)" --name=nationalparks  --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
+	
+
+	
+
+	#oc start-build parksmap --from-file=$HOME/advdev_homework_template/ParksMap/target/parksmap.jar --follow
+	#oc new-app $GUID-parks-dev/parksmap:latest -e APPNAME="ParksMap (Dev)" --name=parksmap  
+	#oc new-app $GUID-parks-dev/parksmap:0.0-0 -e APPNAME="ParksMap (Dev)" --name=parksmap  --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
+	
+
+	#create applications
+	
+
+	#oc new-app ${GUID}-parks-dev/mlbparks:0.0-0 --name=mlbparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
+	
+
+	#oc new-app ${GUID}-parks-dev/nationalparks:0.0-0 --name=nationalparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
+	
+
+	#oc new-app ${GUID}-parks-dev/parksmap:0.0-0 --name=parksmap --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
+	
+
+	#create app
+	oc new-app ${GUID}-parks-dev/mlbparks:0.0-0 --name=mlbparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
+	oc new-app ${GUID}-parks-dev/nationalparks:0.0-0 --name=nationalparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
+	oc new-app ${GUID}-parks-dev/parksmap:0.0-0 --name=parksmap --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
+	#oc rollout pause dc/mlbparks
+	#oc rollout pause dc/nationalparks
+	#oc rollout pause dc/parksmap
+	
+
+	
+
+	echo 'Set triggers - remove'
+	oc set triggers dc/mlbparks --remove-all
+	oc set triggers dc/nationalparks --remove-all
+	oc set triggers dc/parksmap --remove-all
+	
+
+	
+
+	####       Expose and label the services properly (parksmap-backend)
+	echo   'Expose and label the services properly (parksmap-backend)'
+	oc expose dc mlbparks --port 8080
+	oc expose dc nationalparks --port 8080
+	oc expose dc parksmap --port 8080
+	
+
+	oc expose svc mlbparks -l type=parksmap-backend
+	oc expose svc nationalparks  -l type=parksmap-backend
+	oc expose svc parksmap  -l type=parksmap-backend
+	
+
+	
+
+	######     Set up liveness and readiness probes
+	echo 'Set up liveness and readiness probes'
+	oc set probe dc/mlbparks --readiness     --initial-delay-seconds 30 --failure-threshold 3   --get-url=http://:8080/ws/healthz/
+	oc set probe dc/mlbparks --liveness      --initial-delay-seconds 30 --failure-threshold 3     --get-url=http://:8080/ws/healthz/
+	
+
+	oc set probe dc/nationalparks --readiness     --initial-delay-seconds 30 --failure-threshold 3   --get-url=http://:8080/ws/healthz/
+	
+
+	oc set probe dc/nationalparks --liveness      --initial-delay-seconds 30 --failure-threshold 3     --get-url=http://:8080/ws/healthz/
+	
+
+	
+
+	oc set probe dc/parksmap --readiness     --initial-delay-seconds 30 --failure-threshold 3   --get-url=http://:8080/ws/healthz/
+	oc set probe dc/parksmap --liveness      --initial-delay-seconds 30 --failure-threshold 3     --get-url=http://:8080/ws/healthz/
+	
+
+	
+
+	#oc create configmap mlbparks-config --from-literal="application-db.properties=Placeholder"
+	#oc create configmap nationalparks-config --from-literal="application-db.properties=Placeholder"
+	
+
+	######   Configure the deployment configurations using the ConfigMaps
+	echo 'Configure the deployment configurations using the ConfigMaps'
+	oc set env dc/nationalparks --from=configmap/nationalparks-config
+	oc set env dc/nationalparks --from=configmap/mongodb-configmap
+	oc set env dc/mlbparks --from=configmap/mlbparks-config
+	oc set env dc/mlbparks --from=configmap/mongodb-configmap
+	oc set env dc/parksmap --from=configmap/parksmap-config
+	
+
+	
+
+	echo 'oc patch dc and deployment hooks'
+	
+
+	oc patch dc/parksmap --patch "spec: { strategy: {type: Rolling, rollingParams: {post: {failurePolicy: Ignore, execNewPod: {containerName: parksmap, command: ['curl -XGET http://localhost:8080/ws/data/load/']}}, timeoutSeconds: 6000}}}"
+	oc patch dc/mlbparks --patch "spec: { strategy: {type: Rolling, rollingParams: {post: {failurePolicy: Ignore, execNewPod: {containerName: mlbparks, command: ['curl -XGET http://localhost:8080/ws/data/load/']}}, timeoutSeconds: 6000}}}"
+	oc patch dc/nationalparks --patch "spec: { strategy: {type: Rolling, rollingParams: {post: {failurePolicy: Ignore, execNewPod: {containerName: nationalparks, command: ['curl -XGET http://localhost:8080/ws/data/load/']}}, timeoutSeconds: 6000}}}"
+	##### Set deploymenth  hooks
+	    
+	
+
+	oc set deployment-hook dc/nationalparks  -n ${GUID}-parks-dev --post -c nationalparks --failure-policy=abort -- curl http://$(oc get route nationalparks -n ${GUID}-parks-dev -o jsonpath='{ .spec.host }')/ws/data/load/
+	oc set deployment-hook dc/mlbparks  -n ${GUID}-parks-dev --post -c mlbparks --failure-policy=abort -- curl http://$(oc get route mlbparks -n ${GUID}-parks-dev -o jsonpath='{ .spec.host }')/ws/data/load/
+	oc set deployment-hook dc/parksmap  -n ${GUID}-parks-dev --post -c parksmap --failure-policy=abort -- curl http://$(oc get route parksmap -n ${GUID}-parks-dev -o jsonpath='{ .spec.host }')/ws/data/load/
+	
+
+	#sleep 300
+	#oc rollout latest dc/mlbparks -n $GUID-parks-dev
+	#oc rollout latest dc/parksmap -n $GUID-parks-dev
+	#oc rollout latest dc/nationalparks -n $GUID-parks-dev
+	
+
+	#echo '********************************************************'
+	#echo 'Dev deployment resumed'
+	#echo '********************************************************'
+	
+
+	#oc rollout resume dc/mlbparks  -n $GUID-parks-dev
+	#oc rollout resume dc/nationalparks  -n $GUID-parks-dev
+	#oc rollout resume dc/parksmap  -n $GUID-parks-dev
+	#sleep 300
+	oc rollout latest dc/mlbparks  -n $GUID-parks-dev
+	oc rollout latest dc/nationalparks  -n $GUID-parks-dev
+	oc rollout latest dc/parksmap  -n $GUID-parks-dev
+	sleep 300
+	
+
+	echo '********************************************************'
+	echo 'Dev deployment terminated'
+	echo '********************************************************'
+	
+
+	#sleep 300
+	
+
+	
+
+	echo "Finished setting up dev"
+
