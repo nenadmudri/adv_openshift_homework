@@ -7,6 +7,7 @@
 	    exit 1
 	fi
 	
+	sleep 300
 
 	#oc rollout resume dc/mlbparks
 	#oc rollout resume dc/nationalparks
