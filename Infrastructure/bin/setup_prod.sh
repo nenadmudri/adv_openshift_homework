@@ -7,8 +7,8 @@ if [ "$#" -ne 1 ]; then
 fi
 #echo "Skipping production for now"
 #exit
-sleep 1200
-echo '....sleep 1200'
+sleep 2000
+echo '....sleep 2000'
 
 GUID=$1
 echo "Setting up Parks Production Environment in project ${GUID}-parks-prod"
