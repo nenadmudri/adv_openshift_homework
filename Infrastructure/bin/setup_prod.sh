@@ -39,13 +39,13 @@ oc policy add-role-to-user admin system:serviceaccount:gpte-jenkins:jenkins -n $
 
 #oc create configmap mongodb-prod-configmap        --from-literal=DB_HOST=mongodb-p    --from-literal=DB_PORT=27017   --from-literal=DB_USERNAME=mongodb-p     --from-literal=DB_PASSWORD=mongodb-p   --from-literal=DB_NAME=parks-prod   --from-literal=DB_REPLICASET=rs3
 # Config MongoDB configmap
-oc -n ${GUID}-parks-prod create configmap park-prd-conf \
-       --from-literal=DB_REPLICASET=rs0 \
-       --from-literal=DB_HOST=mongodb \
-       --from-literal=DB_PORT=27017 \
-       --from-literal=DB_USERNAME=mongodb \
-       --from-literal=DB_PASSWORD=mongodb \
-       --from-literal=DB_NAME=parks
+#oc -n ${GUID}-parks-prod create configmap park-prd-conf \
+#       --from-literal=DB_REPLICASET=rs0 \
+#       --from-literal=DB_HOST=mongodb \
+#       --from-literal=DB_PORT=27017 \
+#       --from-literal=DB_USERNAME=mongodb \
+#       --from-literal=DB_PASSWORD=mongodb \
+#       --from-literal=DB_NAME=parks
        
        
 #oc create configmap b-nationalparks-config     --from-literal=APPNAME="National Parks (Blue)"
@@ -67,52 +67,38 @@ oc -n ${GUID}-parks-prod create configmap park-prd-conf \
 #oc rollout pause dc/mongodb
 
 
+echo 'MONGODB creation for prod'
+
 echo 'kind: Service
 apiVersion: v1
 metadata:
   name: "mongodb-internal"
- 1 labels:
-    name: "mongodb-p"
+  labels:
+    name: "mongodb"
   annotations:
     service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
 spec:
   clusterIP: None
   ports:
-    - name: mongodb-p
+    - name: mongodb
       port: 27017
   selector:
-    name: "mongodb-p"' | oc create -n ${GUID}-parks-prod -f -
+    name: "mongodb"' | oc create -n ${GUID}-parks-prod -f -
 
 echo 'kind: Service
 apiVersion: v1
 metadata:
-  name: "mongodb-p"
+  name: "mongodb"
   labels:
-    name: "mongodb-p"
+    name: "mongodb"
 spec:
   ports:
-    - name: mongodb-p
+    - name: mongodb
       port: 27017
   selector:
-    name: "mongodb-p"' | oc create -n ${GUID}-parks-prod -f -
-    
-    
+    name: "mongodb"' | oc create -n ${GUID}-parks-prod -f -
 
-oc set env dc/mongodb-p --from=configmap/park-prd-conf
-echo "apiVersion: "v1"
-kind: "PersistentVolumeClaim"
-metadata:
-  name: "mongo-pvc-prod"
-spec:
-  accessModes:
-    - "ReadWriteOnce"
-  resources:
-    requests:
-      storage: "2Gi"" | oc create -f -
-
-
-oc set volume dc/mongodb-p --add --type=persistentVolumeClaim --name=mongo-pv --claim-name=mongo-pvc-prod --mount-path=/data --containers=*
-oc rollout resume dc/mongodb-p
+oc create -f ./Infrastructure/templates/mongodb-prod.yml -n ${GUID}-parks-prod
 
 while : ; do
     oc get pod -n ${GUID}-parks-prod | grep -v deploy | grep "1/1"
