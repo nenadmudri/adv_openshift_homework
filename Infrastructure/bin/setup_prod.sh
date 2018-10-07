@@ -351,6 +351,10 @@ echo '**************************************************************************
 oc set deployment-hook dc/g-nationalparks  -n ${GUID}-parks-dev --post -c nationalparks --failure-policy=abort -- curl http://$(oc get route nationalparks -n ${GUID}-parks-dev -o jsonpath='{ .spec.host }')/ws/data/load/
 oc set deployment-hook dc/g-mlbparks  -n ${GUID}-parks-dev --post -c mlbparks --failure-policy=abort -- curl http://$(oc get route mlbparks -n ${GUID}-parks-dev -o jsonpath='{ .spec.host }')/ws/data/load/
 oc set deployment-hook dc/g-parksmap  -n ${GUID}-parks-dev --post -c parksmap --failure-policy=abort -- curl http://$(oc get route parksmap -n ${GUID}-parks-dev -o jsonpath='{ .spec.host }')/ws/data/load/
+oc set deployment-hook dc/b-nationalparks  -n ${GUID}-parks-dev --post -c nationalparks --failure-policy=abort -- curl http://$(oc get route nationalparks -n ${GUID}-parks-dev -o jsonpath='{ .spec.host }')/ws/data/load/
+oc set deployment-hook dc/b-mlbparks  -n ${GUID}-parks-dev --post -c mlbparks --failure-policy=abort -- curl http://$(oc get route mlbparks -n ${GUID}-parks-dev -o jsonpath='{ .spec.host }')/ws/data/load/
+oc set deployment-hook dc/b-parksmap  -n ${GUID}-parks-dev --post -c parksmap --failure-policy=abort -- curl http://$(oc get route parksmap -n ${GUID}-parks-dev -o jsonpath='{ .spec.host }')/ws/data/load/
+
 
 #sleep 1000
 
