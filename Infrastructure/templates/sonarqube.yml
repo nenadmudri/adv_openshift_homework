@@ -149,7 +149,7 @@ objects:
             value: jdbc:postgresql://postgresql/sonar
           - name: SONARQUBE_JDBC_USERNAME
             value: sonar
-          image: wkulhanek/sonarqube
+          image: wkulhanek/sonarqube@sha256:8881232a1cd5636768df366eb8803255276618bf6252b01516c0a70bcaaf4943
           imagePullPolicy: IfNotPresent
           livenessProbe:
             exec:
@@ -177,11 +177,9 @@ objects:
             timeoutSeconds: 1
           resources:
             limits:
-              cpu: "2"
-              memory: 3Gi
+              memory: 4Gi
             requests:
-              cpu: "1"
-              memory: 2Gi
+              memory: 3Gi
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           volumeMounts:
