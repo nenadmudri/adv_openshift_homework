@@ -369,9 +369,13 @@ oc set deployment-hook dc/g-parksmap  -n ${GUID}-parks-dev --post -c parksmap --
 
 #sleep 1000
 
-oc rollout latest dc/mlbparks  -n $GUID-parks-dev
-	oc rollout latest dc/nationalparks  -n $GUID-parks-dev
-	oc rollout latest dc/parksmap  -n $GUID-parks-dev
+oc rollout latest dc/b-mlbparks  -n $GUID-parks-dev
+oc rollout latest dc/b-nationalparks  -n $GUID-parks-dev
+oc rollout latest dc/b-parksmap  -n $GUID-parks-dev
+
+oc rollout latest dc/g-mlbparks  -n $GUID-parks-dev
+oc rollout latest dc/g-nationalparks  -n $GUID-parks-dev
+oc rollout latest dc/g-parksmap  -n $GUID-parks-dev
 
 echo '*********************************************************************************'
 echo 'Rollout terminated'
