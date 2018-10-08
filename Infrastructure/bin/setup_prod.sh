@@ -16,6 +16,7 @@ echo "Setting up Parks Production Environment in project ${GUID}-parks-prod"
 # Code to set up the parks production project. It will need a StatefulSet MongoDB, and two applications each (Blue/Green) for NationalParks, MLBParks and Parksmap.
 # The Green services/routes need to be active initially to guarantee a successful grading pipeline run.
 
+sleep 300
 
 ####     Grant the correct permissions to the Jenkins service account
 
@@ -54,7 +55,7 @@ echo 'Rollout started'
 echo '*********************************************************************************'
 
 
-#configmaps
+echo 'Create Prod configmaps'
 
 oc create configmap mlbparks-blue-config --from-env-file=./Infrastructure/templates/b-MLBParks -n ${GUID}-parks-prod
 oc create configmap nationalparks-blue-config --from-env-file=./Infrastructure/templates/b-NationalParks -n ${GUID}-parks-prod
@@ -63,7 +64,8 @@ oc create configmap mlbparks-green-config --from-env-file=./Infrastructure/templ
 oc create configmap nationalparks-green-config --from-env-file=./Infrastructure/templates/g-NationalParks -n ${GUID}-parks-prod
 oc create configmap parksmap-green-config --from-env-file=./Infrastructure/templates/g-ParksMap -n ${GUID}-parks-prod
 
-#blue services
+
+echo 'Create Blue apps'
 
 oc new-app ${GUID}-parks-dev/mlbparks:0.0 --name=b-mlbparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
 oc new-app ${GUID}-parks-dev/nationalparks:0.0 --name=b-nationalparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
@@ -73,15 +75,23 @@ oc set triggers dc/b-mlbparks --remove-all -n ${GUID}-parks-prod
 oc set triggers dc/b-nationalparks --remove-all -n ${GUID}-parks-prod
 oc set triggers dc/b-parksmap --remove-all -n ${GUID}-parks-prod
 
+
+echo 'Set blue apps env'
+
+
 oc set env dc/b-mlbparks --from=configmap/mlbparks-blue-config -n ${GUID}-parks-prod
 oc set env dc/b-nationalparks --from=configmap/nationalparks-blue-config -n ${GUID}-parks-prod
 oc set env dc/b-parksmap --from=configmap/parksmap-blue-config -n ${GUID}-parks-prod
 
-#green services
+
+echo 'Set green apps'
 
 oc new-app ${GUID}-parks-dev/mlbparks:0.0 --name=g-mlbparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
 oc new-app ${GUID}-parks-dev/nationalparks:0.0 --name=g-nationalparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
 oc new-app ${GUID}-parks-dev/parksmap:0.0 --name=g-parksmap --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
+
+
+echo 'Set triggers and env for green apps'
 
 oc set triggers dc/g-mlbparks --remove-all -n ${GUID}-parks-prod
 oc set triggers dc/g-nationalparks --remove-all -n ${GUID}-parks-prod
@@ -91,7 +101,7 @@ oc set env dc/g-mlbparks --from=configmap/mlbparks-green-config -n ${GUID}-parks
 oc set env dc/g-nationalparks --from=configmap/nationalparks-green-config -n ${GUID}-parks-prod
 oc set env dc/g-parksmap --from=configmap/parksmap-green-config -n ${GUID}-parks-prod
 
-#expose deployment config for all services
+echo 'Expose dcs'
 
 oc expose dc g-mlbparks --port 8080 -n ${GUID}-parks-prod
 oc expose dc g-nationalparks --port 8080 -n ${GUID}-parks-prod
@@ -101,11 +111,14 @@ oc expose dc b-mlbparks --port 8080 -n ${GUID}-parks-prod
 oc expose dc b-nationalparks --port 8080 -n ${GUID}-parks-prod
 oc expose dc b-parksmap --port 8080 -n ${GUID}-parks-prod
 
-#expose green service
+echo 'Expose svc'
 
 oc expose svc g-mlbparks --name mlbparks -n ${GUID}-parks-prod --labels="type=parksmap-backend"
 oc expose svc g-nationalparks --name nationalparks -n ${GUID}-parks-prod --labels="type=parksmap-backend"
 oc expose svc g-parksmap --name parksmap -n ${GUID}-parks-prod
+
+
+echo 'Set deployment hooks'
 
 oc set deployment-hook dc/g-mlbparks  -n ${GUID}-parks-prod --post -c g-mlbparks --failure-policy=ignore -- curl http://g-mlbparks.${GUID}-parks-prod.svc.cluster.local:8080/ws/data/load/
 oc set deployment-hook dc/g-nationalparks  -n ${GUID}-parks-prod --post -c g-nationalparks --failure-policy=ignore -- curl http://g-nationalparks.${GUID}-parks-prod.svc.cluster.local:8080/ws/data/load/
@@ -114,6 +127,11 @@ oc set deployment-hook dc/g-parksmap  -n ${GUID}-parks-prod --post -c g-parksmap
 oc set deployment-hook dc/b-mlbparks  -n ${GUID}-parks-prod --post -c b-mlbparks --failure-policy=ignore -- curl http://b-mlbparks.${GUID}-parks-prod.svc.cluster.local:8080/ws/data/load/
 oc set deployment-hook dc/b-nationalparks  -n ${GUID}-parks-prod --post -c b-nationalparks --failure-policy=ignore -- curl http://b-nationalparks.${GUID}-parks-prod.svc.cluster.local:8080/ws/data/load/
 oc set deployment-hook dc/b-parksmap  -n ${GUID}-parks-prod --post -c b-parksmap --failure-policy=ignore -- curl http://b-mlbparks.${GUID}-parks-prod.svc.cluster.local:8080/ws/data/load/
+
+
+
+echo 'Set probes'
+
 
 oc set probe dc/b-parksmap --liveness --failure-threshold 5 --initial-delay-seconds 30 -- echo ok -n ${GUID}-parks-prod
 oc set probe dc/b-parksmap --readiness --failure-threshold 5 --initial-delay-seconds 60 --get-url=http://:8080/ws/healthz/ -n ${GUID}-parks-prod
