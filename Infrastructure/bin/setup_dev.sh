@@ -65,13 +65,13 @@
 
 	echo   'Expose and label the services properly (parksmap-backend)'
 	
-	oc expose dc mlbparks --port 8080
-	oc expose dc nationalparks --port 8080
-	oc expose dc parksmap --port 8080
-	
-	oc expose svc mlbparks -l type=parksmap-backend
-	oc expose svc nationalparks  -l type=parksmap-backend
-	oc expose svc parksmap  -l type=parksmap-backend
+	oc expose dc mlbparks --port 8080 --labels="type=parksmap-backend" -n ${GUID}-parks-dev
+	oc expose dc nationalparks --port 8080 --labels="type=parksmap-backend" -n ${GUID}-parks-dev
+	oc expose dc parksmap --port 8080 -n ${GUID}-parks-dev
+	oc expose svc mlbparks --labels="type=parksmap-backend" -n ${GUID}-parks-dev
+	oc expose svc nationalparks --labels="type=parksmap-backend" -n ${GUID}-parks-dev
+	oc expose svc parksmap -n ${GUID}-parks-dev
+
 	
 
 	echo 'Set up liveness and readiness probes'
