@@ -68,14 +68,10 @@
 	oc create configmap mongodb-configmap        --from-literal=DB_HOST=mongodb    --from-literal=DB_PORT=27017   --from-literal=DB_USERNAME=mongodb     --from-literal=DB_PASSWORD=mongodb   --from-literal=DB_NAME=parks   --from-literal=DB_REPLICASET=rs0
 	
 
-	oc create configmap nationalparks-config     --from-literal=APPNAME="National Parks (Dev)"   
-	
+	oc create configmap mlbparks-config --from-literal="APPNAME=MLB Parks (Dev)" --from-literal="DB_HOST=mongodb" --from-literal="DB_PORT=27017" --from-literal="DB_USERNAME=mongodb" --from-literal="DB_PASSWORD=mongodb" --from-literal="DB_NAME=parks" -n ${GUID}-parks-dev
+	oc create configmap nationalparks-config --from-literal="APPNAME=National Parks (Dev)" --from-literal="DB_HOST=mongodb" --from-literal="DB_PORT=27017" --from-literal="DB_USERNAME=mongodb" --from-literal="DB_PASSWORD=mongodb" --from-literal="DB_NAME=parks" -n ${GUID}-parks-dev
+	oc create configmap parksmap-config --from-literal="APPNAME=ParksMap (Dev)" -n ${GUID}-parks-dev
 
-	oc create configmap mlbparks-config     --from-literal=APPNAME="MLB Parks (Dev)"
-	
-
-	oc create configmap parksmap-config     --from-literal=APPNAME="ParksMap (Dev)"
-	
 
 	
 
@@ -211,51 +207,36 @@
 	echo 'Set up liveness and readiness probes'
 	oc set probe dc/mlbparks --readiness     --initial-delay-seconds 30 --failure-threshold 3   --get-url=http://:8080/ws/healthz/
 	oc set probe dc/mlbparks --liveness      --initial-delay-seconds 30 --failure-threshold 3     --get-url=http://:8080/ws/healthz/
-	
-
 	oc set probe dc/nationalparks --readiness     --initial-delay-seconds 30 --failure-threshold 3   --get-url=http://:8080/ws/healthz/
-	
-
 	oc set probe dc/nationalparks --liveness      --initial-delay-seconds 30 --failure-threshold 3     --get-url=http://:8080/ws/healthz/
-	
-
-	
-
 	oc set probe dc/parksmap --readiness     --initial-delay-seconds 30 --failure-threshold 3   --get-url=http://:8080/ws/healthz/
 	oc set probe dc/parksmap --liveness      --initial-delay-seconds 30 --failure-threshold 3     --get-url=http://:8080/ws/healthz/
 	
-
-	
-
 	#oc create configmap mlbparks-config --from-literal="application-db.properties=Placeholder"
 	#oc create configmap nationalparks-config --from-literal="application-db.properties=Placeholder"
 	
 
 	######   Configure the deployment configurations using the ConfigMaps
 	echo 'Configure the deployment configurations using the ConfigMaps'
-	oc set env dc/nationalparks --from=configmap/nationalparks-config
-	oc set env dc/nationalparks --from=configmap/mongodb-configmap
-	oc set env dc/mlbparks --from=configmap/mlbparks-config
-	oc set env dc/mlbparks --from=configmap/mongodb-configmap
-	oc set env dc/parksmap --from=configmap/parksmap-config
+	oc set env dc/mlbparks --from=configmap/mlbparks-config -n ${GUID}-parks-dev
+	oc set env dc/nationalparks --from=configmap/nationalparks-config -n ${GUID}-parks-dev
+	oc set env dc/parksmap --from=configmap/parksmap-config -n ${GUID}-parks-dev
 	
 
 	
 
-	echo 'oc patch dc and deployment hooks'
+	echo 'oc  set deployment hooks'
 	
 
-	oc patch dc/parksmap --patch "spec: { strategy: {type: Rolling, rollingParams: {post: {failurePolicy: Ignore, execNewPod: {containerName: parksmap, command: ['curl -XGET http://localhost:8080/ws/data/load/']}}, timeoutSeconds: 6000}}}"
-	oc patch dc/mlbparks --patch "spec: { strategy: {type: Rolling, rollingParams: {post: {failurePolicy: Ignore, execNewPod: {containerName: mlbparks, command: ['curl -XGET http://localhost:8080/ws/data/load/']}}, timeoutSeconds: 6000}}}"
-	oc patch dc/nationalparks --patch "spec: { strategy: {type: Rolling, rollingParams: {post: {failurePolicy: Ignore, execNewPod: {containerName: nationalparks, command: ['curl -XGET http://localhost:8080/ws/data/load/']}}, timeoutSeconds: 6000}}}"
+	#oc patch dc/parksmap --patch "spec: { strategy: {type: Rolling, rollingParams: {post: {failurePolicy: Ignore, execNewPod: {containerName: parksmap, command: ['curl -XGET http://localhost:8080/ws/data/load/']}}, timeoutSeconds: 6000}}}"
+	#oc patch dc/mlbparks --patch "spec: { strategy: {type: Rolling, rollingParams: {post: {failurePolicy: Ignore, execNewPod: {containerName: mlbparks, command: ['curl -XGET http://localhost:8080/ws/data/load/']}}, timeoutSeconds: 6000}}}"
+	#oc patch dc/nationalparks --patch "spec: { strategy: {type: Rolling, rollingParams: {post: {failurePolicy: Ignore, execNewPod: {containerName: nationalparks, command: ['curl -XGET http://localhost:8080/ws/data/load/']}}, timeoutSeconds: 6000}}}"
 	##### Set deploymenth  hooks
 	    
-	
+	oc set deployment-hook dc/mlbparks  -n ${GUID}-parks-dev --post -c mlbparks --failure-policy=retry -- curl http://mlbparks.${GUID}-parks-dev.svc.cluster.local:8080/ws/data/load/
+	oc set deployment-hook dc/nationalparks  -n ${GUID}-parks-dev --post -c nationalparks --failure-policy=retry -- curl http://nationalparks.${GUID}-parks-dev.svc.cluster.local:8080/ws/data/load/
 
-	oc set deployment-hook dc/nationalparks  -n ${GUID}-parks-dev --post -c nationalparks --failure-policy=abort -- curl http://$(oc get route nationalparks -n ${GUID}-parks-dev -o jsonpath='{ .spec.host }')/ws/data/load/
-	oc set deployment-hook dc/mlbparks  -n ${GUID}-parks-dev --post -c mlbparks --failure-policy=abort -- curl http://$(oc get route mlbparks -n ${GUID}-parks-dev -o jsonpath='{ .spec.host }')/ws/data/load/
-	oc set deployment-hook dc/parksmap  -n ${GUID}-parks-dev --post -c parksmap --failure-policy=abort -- curl http://$(oc get route parksmap -n ${GUID}-parks-dev -o jsonpath='{ .spec.host }')/ws/data/load/
-	
+
 
 	#sleep 300
 	#oc rollout latest dc/mlbparks -n $GUID-parks-dev
