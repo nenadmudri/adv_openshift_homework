@@ -85,7 +85,7 @@ podTemplate(
 
     // Deploy the development application.
     // Replace xyz-tasks-dev with the name of your production project
-    openshiftDeploy depCfg: 'parksmap', namespace: '${GUID}-parks-dev', verbose: 'false', waitTime: '20', waitUnit: 'min'
+    openshiftDeploy depCfg: 'parksmap', namespace: '${GUID}-parks-dev', verbose: 'true', waitTime: '40', waitUnit: 'min'
     openshiftVerifyDeployment depCfg: 'parksmap', namespace: '${GUID}-parks-dev', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '', waitUnit: 'sec'
     openshiftVerifyService namespace: '${GUID}-parks-dev', svcName: 'parksmap', verbose: 'false'
   }
