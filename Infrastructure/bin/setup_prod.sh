@@ -333,8 +333,8 @@ echo '**************************************************************************
 #oc set deployment-hook dc/g-mlbparks  -n ${GUID}-parks-prod --post -c mlbparks --failure-policy=abort -- curl http://$(oc get route mlbparks -n ${GUID}-parks-prod -o jsonpath='{ .spec.host }')/ws/data/load/
 #oc set deployment-hook dc/g-parksmap  -n ${GUID}-parks-prod --post -c parksmap --failure-policy=abort -- curl http://$(oc get route parksmap -n ${GUID}-parks-prod -o jsonpath='{ .spec.host }')/ws/data/load/
 #oc set deployment-hook dc/b-nationalparks  -n ${GUID}-parks-prod --post -c nationalparks --failure-policy=abort -- curl http://$(oc get route nationalparks -n ${GUID}-parks-prod -o jsonpath='{ .spec.host }')/ws/data/load/
-oc set deployment-hook dc/b-mlbparks  -n ${GUID}-parks-prod --post -c mlbparks --failure-policy=abort -- curl http://$(oc get route mlbparks -n ${GUID}-parks-prod -o jsonpath='{ .spec.host }')/ws/data/load/
-oc set deployment-hook dc/b-parksmap  -n ${GUID}-parks-prod --post -c parksmap --failure-policy=abort -- curl http://$(oc get route parksmap -n ${GUID}-parks-prod -o jsonpath='{ .spec.host }')/ws/data/load/
+#oc set deployment-hook dc/b-mlbparks  -n ${GUID}-parks-prod --post -c mlbparks --failure-policy=abort -- curl http://$(oc get route mlbparks -n ${GUID}-parks-prod -o jsonpath='{ .spec.host }')/ws/data/load/
+#oc set deployment-hook dc/b-parksmap  -n ${GUID}-parks-prod --post -c parksmap --failure-policy=abort -- curl http://$(oc get route parksmap -n ${GUID}-parks-prod -o jsonpath='{ .spec.host }')/ws/data/load/
 
 
 #sleep 1000
@@ -374,7 +374,8 @@ oc create configmap mlbparks-green-config --from-env-file=./Infrastructure/templ
 oc create configmap nationalparks-green-config --from-env-file=./Infrastructure/templates/g-NationalParks -n ${GUID}-parks-prod
 oc create configmap parksmap-green-config --from-env-file=./Infrastructure/templates/g-ParksMap -n ${GUID}-parks-prod
 
-#blue
+#blue services
+
 oc new-app ${GUID}-parks-dev/mlbparks:0.0 --name=b-mlbparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
 oc new-app ${GUID}-parks-dev/nationalparks:0.0 --name=b-nationalparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
 oc new-app ${GUID}-parks-dev/parksmap:0.0 --name=b-parksmap --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
@@ -387,7 +388,8 @@ oc set env dc/b-mlbparks --from=configmap/mlbparks-blue-config -n ${GUID}-parks-
 oc set env dc/b-nationalparks --from=configmap/nationalparks-blue-config -n ${GUID}-parks-prod
 oc set env dc/b-parksmap --from=configmap/parksmap-blue-config -n ${GUID}-parks-prod
 
-#green
+#green services
+
 oc new-app ${GUID}-parks-dev/mlbparks:0.0 --name=g-mlbparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
 oc new-app ${GUID}-parks-dev/nationalparks:0.0 --name=g-nationalparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
 oc new-app ${GUID}-parks-dev/parksmap:0.0 --name=g-parksmap --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
@@ -400,7 +402,8 @@ oc set env dc/g-mlbparks --from=configmap/mlbparks-green-config -n ${GUID}-parks
 oc set env dc/g-nationalparks --from=configmap/nationalparks-green-config -n ${GUID}-parks-prod
 oc set env dc/g-parksmap --from=configmap/parksmap-green-config -n ${GUID}-parks-prod
 
-#expose
+#expose deployment config for all services
+
 oc expose dc g-mlbparks --port 8080 -n ${GUID}-parks-prod
 oc expose dc g-nationalparks --port 8080 -n ${GUID}-parks-prod
 oc expose dc g-parksmap --port 8080 -n ${GUID}-parks-prod
@@ -409,7 +412,8 @@ oc expose dc b-mlbparks --port 8080 -n ${GUID}-parks-prod
 oc expose dc b-nationalparks --port 8080 -n ${GUID}-parks-prod
 oc expose dc b-parksmap --port 8080 -n ${GUID}-parks-prod
 
-#set green live
+#expose green service
+
 oc expose svc g-mlbparks --name mlbparks -n ${GUID}-parks-prod --labels="type=parksmap-backend"
 oc expose svc g-nationalparks --name nationalparks -n ${GUID}-parks-prod --labels="type=parksmap-backend"
 oc expose svc g-parksmap --name parksmap -n ${GUID}-parks-prod
@@ -434,6 +438,16 @@ oc set probe dc/g-mlbparks --liveness --failure-threshold 5 --initial-delay-seco
 oc set probe dc/g-mlbparks --readiness --failure-threshold 3 --initial-delay-seconds 60 --get-url=http://:8080/ws/healthz/ -n ${GUID}-parks-prod
 oc set probe dc/g-nationalparks --liveness --failure-threshold 5 --initial-delay-seconds 30 -- echo ok -n ${GUID}-parks-prod
 oc set probe dc/g-nationalparks --readiness --failure-threshold 3 --initial-delay-seconds 60 --get-url=http://:8080/ws/healthz/ -n ${GUID}-parks-prod
+
+#Deploy latest 
+
+oc rollout latest dc/b-mlbparks  -n $GUID-parks-prod
+oc rollout latest dc/b-nationalparks  -n $GUID-parks-prod
+oc rollout latest dc/b-parksmap  -n $GUID-parks-prod
+
+oc rollout latest dc/g-mlbparks  -n $GUID-parks-prod
+oc rollout latest dc/g-nationalparks  -n $GUID-parks-prod
+oc rollout latest dc/g-parksmap  -n $GUID-parks-prod
 
 echo '*********************************************************************************'
 echo 'Rollout terminated'
