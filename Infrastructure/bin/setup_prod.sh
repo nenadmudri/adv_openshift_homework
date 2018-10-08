@@ -69,34 +69,34 @@ oc policy add-role-to-user admin system:serviceaccount:gpte-jenkins:jenkins -n $
 
 echo 'MONGODB creation for prod'
 
-echo 'kind: Service
-apiVersion: v1
-metadata:
-  name: "mongodb-internal"
-  labels:
-    name: "mongodb"
-  annotations:
-    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
-spec:
-  clusterIP: None
-  ports:
-    - name: mongodb
-      port: 27017
-  selector:
-    name: "mongodb"' | oc create -n ${GUID}-parks-prod -f -
+#echo 'kind: Service
+#apiVersion: v1
+#metadata:
+#  name: "mongodb-internal"
+#  labels:
+#    name: "mongodb"
+#  annotations:
+#    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+#spec:
+#  clusterIP: None
+#  ports:
+#    - name: mongodb
+#      port: 27017
+#  selector:
+#    name: "mongodb"' | oc create -n ${GUID}-parks-prod -f -
 
-echo 'kind: Service
-apiVersion: v1
-metadata:
-  name: "mongodb"
-  labels:
-    name: "mongodb"
-spec:
-  ports:
-    - name: mongodb
-      port: 27017
-  selector:
-    name: "mongodb"' | oc create -n ${GUID}-parks-prod -f -
+#echo 'kind: Service
+#apiVersion: v1
+#metadata:
+#  name: "mongodb"
+#  labels:
+#    name: "mongodb"
+#spec:
+#  ports:
+#    - name: mongodb
+#      port: 27017
+#  selector:
+#    name: "mongodb"' | oc create -n ${GUID}-parks-prod -f -
 
 oc create -f ./Infrastructure/templates/mongodb-prod.yml -n ${GUID}-parks-prod
 
