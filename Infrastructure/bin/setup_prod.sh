@@ -7,8 +7,8 @@ if [ "$#" -ne 1 ]; then
 fi
 #echo "Skipping production for now"
 #exit
-sleep 2000
-echo '....sleep 2000'
+#sleep 2000
+#echo '....sleep 2000'
 
 GUID=$1
 echo "Setting up Parks Production Environment in project ${GUID}-parks-prod"
@@ -441,13 +441,13 @@ oc set probe dc/g-nationalparks --readiness --failure-threshold 3 --initial-dela
 
 #Deploy latest 
 
-oc rollout latest dc/b-mlbparks  -n $GUID-parks-prod
-oc rollout latest dc/b-nationalparks  -n $GUID-parks-prod
-oc rollout latest dc/b-parksmap  -n $GUID-parks-prod
+#oc rollout latest dc/b-mlbparks  -n $GUID-parks-prod
+#oc rollout latest dc/b-nationalparks  -n $GUID-parks-prod
+#oc rollout latest dc/b-parksmap  -n $GUID-parks-prod
 
-oc rollout latest dc/g-mlbparks  -n $GUID-parks-prod
-oc rollout latest dc/g-nationalparks  -n $GUID-parks-prod
-oc rollout latest dc/g-parksmap  -n $GUID-parks-prod
+#oc rollout latest dc/g-mlbparks  -n $GUID-parks-prod
+#oc rollout latest dc/g-nationalparks  -n $GUID-parks-prod
+#oc rollout latest dc/g-parksmap  -n $GUID-parks-prod
 
 echo '*********************************************************************************'
 echo 'Rollout terminated'
