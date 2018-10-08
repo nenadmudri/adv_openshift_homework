@@ -46,21 +46,18 @@
 	#create applications
 	
 
-	#oc new-app ${GUID}-parks-dev/mlbparks:0.0-0 --name=mlbparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
-	#oc new-app ${GUID}-parks-dev/nationalparks:0.0-0 --name=nationalparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev	
-	#oc new-app ${GUID}-parks-dev/parksmap:0.0-0 --name=parksmap --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
 	
-
 	echo 'Create app'
-	oc new-app ${GUID}-parks-dev/mlbparks:latest --name=mlbparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
-	oc new-app ${GUID}-parks-dev/nationalparks:latest --name=nationalparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
-	oc new-app ${GUID}-parks-dev/parksmap:latest --name=parksmap --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
+	
+	oc new-app ${GUID}-parks-dev/mlbparks:0.0-0 --name=mlbparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
+	oc new-app ${GUID}-parks-dev/nationalparks:0.0-0 --name=nationalparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
+	oc new-app ${GUID}-parks-dev/parksmap:0.0-0 --name=parksmap --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
 
 	echo 'Set triggers - remove'
 	
-	oc set triggers dc/mlbparks --remove-all
-	oc set triggers dc/nationalparks --remove-all
-	oc set triggers dc/parksmap --remove-all
+	oc set triggers dc/mlbparks --remove-all -n ${GUID}-parks-dev
+	oc set triggers dc/nationalparks --remove-all -n ${GUID}-parks-dev
+	oc set triggers dc/parksmap --remove-all -n ${GUID}-parks-dev
 	
 
 	echo   'Expose and label the services properly (parksmap-backend)'
@@ -75,12 +72,12 @@
 	
 
 	echo 'Set up liveness and readiness probes'
-	oc set probe dc/mlbparks --readiness     --initial-delay-seconds 30 --failure-threshold 3   --get-url=http://:8080/ws/healthz/
-	oc set probe dc/mlbparks --liveness      --initial-delay-seconds 30 --failure-threshold 3     --get-url=http://:8080/ws/healthz/
-	oc set probe dc/nationalparks --readiness     --initial-delay-seconds 30 --failure-threshold 3   --get-url=http://:8080/ws/healthz/
-	oc set probe dc/nationalparks --liveness      --initial-delay-seconds 30 --failure-threshold 3     --get-url=http://:8080/ws/healthz/
-	oc set probe dc/parksmap --readiness     --initial-delay-seconds 30 --failure-threshold 3   --get-url=http://:8080/ws/healthz/
-	oc set probe dc/parksmap --liveness      --initial-delay-seconds 30 --failure-threshold 3     --get-url=http://:8080/ws/healthz/
+	oc set probe dc/mlbparks --readiness     --initial-delay-seconds 30 --failure-threshold 3   --get-url=http://:8080/ws/healthz/ -n ${GUID}-parks-dev
+	oc set probe dc/mlbparks --liveness      --initial-delay-seconds 30 --failure-threshold 3     --get-url=http://:8080/ws/healthz/ -n ${GUID}-parks-dev
+	oc set probe dc/nationalparks --readiness     --initial-delay-seconds 30 --failure-threshold 3   --get-url=http://:8080/ws/healthz/ -n ${GUID}-parks-dev
+	oc set probe dc/nationalparks --liveness      --initial-delay-seconds 30 --failure-threshold 3     --get-url=http://:8080/ws/healthz/ -n ${GUID}-parks-dev
+	oc set probe dc/parksmap --readiness     --initial-delay-seconds 30 --failure-threshold 3   --get-url=http://:8080/ws/healthz/ -n ${GUID}-parks-dev
+	oc set probe dc/parksmap --liveness      --initial-delay-seconds 30 --failure-threshold 3     --get-url=http://:8080/ws/healthz/ -n ${GUID}-parks-dev
 	
 	echo 'Configure the deployment configurations using the ConfigMaps'
 
