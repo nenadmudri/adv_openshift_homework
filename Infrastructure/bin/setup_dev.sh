@@ -7,7 +7,7 @@
 	    exit 1
 	fi
 	
-	sleep 300
+	#sleep 300
 
 	#oc rollout resume dc/mlbparks
 	#oc rollout resume dc/nationalparks
@@ -87,29 +87,30 @@
 	#oc new-app mongodb-persistent --name=mongodb        
 	oc new-app -e MONGODB_USER=mongodb -e MONGODB_PASSWORD=mongodb -e MONGODB_DATABASE=parks -e MONGODB_ADMIN_PASSWORD=mongodb --name=mongodb registry.access.redhat.com/rhscl/mongodb-34-rhel7:latest -n ${GUID}-parks-dev
 	
+        
 
-	oc rollout pause dc/mongodb
+	#oc rollout pause dc/mongodb
 	
 
 	
 
 	#oc set env dc/mongodb --from=configmap/mongodb-configmap
-	echo "apiVersion: "v1"
-	kind: "PersistentVolumeClaim"
-	metadata:
-	  name: "mongo-pvc"
-	spec:
-	  accessModes:
-	    - "ReadWriteOnce"
-	  resources:
-	    requests:
-	      storage: "2Gi"" | oc create -f -
+	#echo "apiVersion: "v1"
+	#kind: "PersistentVolumeClaim"
+	#metadata:
+	#  name: "mongo-pvc"
+	#spec:
+	#  accessModes:
+	#    - "ReadWriteOnce"
+	#  resources:
+	#    requests:
+	#      storage: "2Gi"" | oc create -f -
 	
 
 	
 
-	oc set volume dc/mongodb --add --type=persistentVolumeClaim --name=mongo-pv --claim-name=mongo-pvc --mount-path=/data --containers=*
-	oc rollout resume dc/mongodb
+	#oc set volume dc/mongodb --add --type=persistentVolumeClaim --name=mongo-pv --claim-name=mongo-pvc --mount-path=/data --containers=*
+	#oc rollout resume dc/mongodb
 	
 
 	while : ; do
