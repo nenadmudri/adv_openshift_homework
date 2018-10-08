@@ -93,7 +93,7 @@ done
 
 oc create configmap basic-config --from-literal="GUID=${GUID}" --from-literal="REPO=${REPO}" --from-literal="CLUSTER=${CLUSTER}"
 
-oc new-build --name=jenkins-slave-appdev   --dockerfile="$(< ./Infrastructure/templates/docker/skopeo/Dockerfile)"  -n $GUID-jenkins
+#oc new-build --name=jenkins-slave-appdev   --dockerfile="$(< ./Infrastructure/templates/docker/skopeo/Dockerfile)"  -n $GUID-jenkins
 
 oc create -f Infrastructure/templates/bl-mlbparks.yml -n ${GUID}-jenkins
 oc create -f Infrastructure/templates/bl-nationalparks.yml -n ${GUID}-jenkins
