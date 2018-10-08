@@ -272,9 +272,9 @@
 	#oc rollout resume dc/nationalparks  -n $GUID-parks-dev
 	#oc rollout resume dc/parksmap  -n $GUID-parks-dev
 	#sleep 300
-	#oc rollout latest dc/mlbparks  -n $GUID-parks-dev
-	#oc rollout latest dc/nationalparks  -n $GUID-parks-dev
-	#oc rollout latest dc/parksmap  -n $GUID-parks-dev
+	oc rollout latest dc/mlbparks  -n $GUID-parks-dev
+	oc rollout latest dc/nationalparks  -n $GUID-parks-dev
+	oc rollout latest dc/parksmap  -n $GUID-parks-dev
 	#sleep 300
 	
 
