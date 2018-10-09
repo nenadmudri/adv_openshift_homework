@@ -112,15 +112,15 @@ podTemplate(
   // Blue/Green Deployment into Production
   // -------------------------------------
   // Do not activate the new version yet.
-  def destApp = "g-mlbparks"
+  def destApp = "mlbparks-green"
   def activeApp = ""
 
   stage('Blue/Green Production Deployment') {
       // Replace xyz-tasks-dev and xyz-tasks-prod with
     // your project names
     activeApp = sh(returnStdout: true, script: "oc get route mlbparks -n ${GUID}-parks-prod -o jsonpath='{ .spec.to.name }'").trim()
-    if (activeApp == "g-mlbparks") {
-    destApp = "b-mlbparks"
+    if (activeApp == "mlbparks-green") {
+    destApp = "mlbparks-blue"
   }
     echo "Active Application:      " + activeApp
     echo "Destination Application: " + destApp
