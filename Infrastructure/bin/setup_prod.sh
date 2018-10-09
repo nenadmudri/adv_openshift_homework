@@ -114,7 +114,7 @@ oc expose dc parksmap-blue --port 8080 -n ${GUID}-parks-prod
 echo 'Expose svc'
 
 oc expose svc mlbparks-green --name mlbparks -n ${GUID}-parks-prod --labels="type=parksmap-backend"
-oc expose svc nationalpark-green --name nationalparks -n ${GUID}-parks-prod --labels="type=parksmap-backend"
+oc expose svc nationalparks-green --name nationalparks -n ${GUID}-parks-prod --labels="type=parksmap-backend"
 oc expose svc parksmap-green --name parksmap -n ${GUID}-parks-prod
 
 
